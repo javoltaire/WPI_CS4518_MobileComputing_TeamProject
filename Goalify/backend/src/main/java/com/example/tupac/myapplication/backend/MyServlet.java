@@ -1,6 +1,9 @@
 package com.example.tupac.myapplication.backend;
 
 import com.example.tupac.myapplication.backend.models.Competition;
+import com.example.tupac.myapplication.backend.models.Round;
+import com.example.tupac.myapplication.backend.models.Team;
+import com.example.tupac.myapplication.backend.service.ConvertJson;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DatabaseReference;
@@ -20,6 +23,8 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -39,6 +44,10 @@ public class MyServlet extends HttpServlet {
     private DatabaseReference firebase;
 
     ArrayList<Competition> competitionArrayList;
+    ArrayList<Round> roundArrayList;
+    ArrayList<Team> teamArrayList;
+
+    FirebaseDatabase database;
 
 
     @Override
@@ -66,10 +75,9 @@ public class MyServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        Log.info("Sending the todo list email.");
 
         String outString;
-        outString = "<p>Sending the todo list email.</p>";
+        outString = "<p>Team_id, Name, Latitude, Longitude</p>";
 
         resp.getWriter().println(outString);
 
@@ -77,80 +85,105 @@ public class MyServlet extends HttpServlet {
         HttpHandler sh = new HttpHandler();
         // Making a request to url and getting response
         String mainUrl = "https://api.crowdscores.com/v1";
-        String apiKey = "?dc736bae447b4f6ba8ec68c530195151";
         String competitions = "/competitions";
+        //competition_id for Premier League is 2
 
-        String jsonStr = sh.makeServiceCall(mainUrl + competitions);
+        String rounds = "/rounds";
+        String teams = "/teams?round_ids=&competition_ids=2";
 
-        if (jsonStr != null) {
+//        String competitionsJsonStr = sh.makeServiceCall(mainUrl + competitions);
+//
+//        if (competitionsJsonStr != null) {
+//            try {
+//                //resp.getWriter().println(competitionsJsonStr);
+//                // Getting JSON Array node
+//                JSONArray competitionList = new JSONArray(competitionsJsonStr);
+//                //use service class to parse this json array and create a competition model
+//                competitionArrayList = ConvertJson.getCompetitionfromJson(competitionList);
+//
+//            } catch (final JSONException e) {
+//            }
+//        }
+//
+//        String roundsJsonStr = sh.makeServiceCall(mainUrl + rounds);
+//
+//        if (roundsJsonStr != null) {
+//            try {
+//                //resp.getWriter().println(roundsJsonStr);
+//                // Getting JSON Array node
+//                JSONArray roundList = new JSONArray(roundsJsonStr);
+//                //use service class to parse this json array and create a round model
+//                roundArrayList = ConvertJson.getRoundfromJson(roundList);
+//
+//            } catch (final JSONException e) {
+//            }
+//        }
+
+
+        String teamsJsonStr = sh.makeServiceCall(mainUrl + teams);
+
+        if (teamsJsonStr != null) {
             try {
-                resp.getWriter().println(jsonStr);
+                //resp.getWriter().println(teamsJsonStr);
                 // Getting JSON Array node
-                JSONArray competitionList = new JSONArray(jsonStr);
-                //use service class to parse this json array and create an airlines model
-                fromJson(competitionList);
+                JSONArray teamList = new JSONArray(teamsJsonStr);
+                //use service class to parse this json array and create a team model
+                teamArrayList = ConvertJson.getTeamfromJson(teamList);
 
             } catch (final JSONException e) {
-            }
 
+            }
         }
 
         if (competitionArrayList != null) {
             for (int i=0; i<competitionArrayList.size(); i++){
-                resp.getWriter().println(competitionArrayList.get(i).getName());
+                resp.getWriter().println("<p>" +  competitionArrayList.get(i).getCompetitionId() + "&nbsp;&nbsp;&nbsp;" +
+                        competitionArrayList.get(i).getCompetitionName() + "<p>");
+
             }
         }
+
+        if (roundArrayList != null) {
+            for (int i=0; i<roundArrayList.size(); i++){
+                resp.getWriter().println("<p>" +  roundArrayList.get(i).getRoundId()  + "&nbsp;&nbsp;&nbsp;" +
+                        roundArrayList.get(i).getCompetition().getCompetitionId() + "&nbsp;&nbsp;&nbsp;" +
+                        roundArrayList.get(i).getCompetition().getCompetitionName() + "<p>");
+
+            }
+        }
+
+        if (teamArrayList != null) {
+            for (int i=0; i<teamArrayList.size(); i++){
+                resp.getWriter().println("<p>" +  teamArrayList.get(i).getTeamId() + "      "  +
+                        teamArrayList.get(i).getTeamName() + "      "  +
+                        teamArrayList.get(i).getTeamLocation().getTeamLatitude() + "      "  +
+                        teamArrayList.get(i).getTeamLocation().getTeamLatitude() + "<p>");
+            }
+        }
+
+        database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference();
+
+        /*
+         * use this only once to populate
+         */
+//        DatabaseReference teamRef = ref.child("teams");
+//
+//        Map<String, Team> teamsMap = new HashMap<String, Team>();
+//
+//        if (teamArrayList != null) {
+//            for (int i=0; i<teamArrayList.size(); i++){
+//                Team team = teamArrayList.get(i);
+//                teamsMap.put(team.getTeamName(), new Team(team.getTeamId(), team.getTeamName(), team.getTeamLocation()));
+//            }
+//        }
+//
+//        teamRef.setValue(teamsMap);
+
 
 
     }
 
-    /*
-     * Decodes airlines json into airlines model object
-     *
-     * @param   jsonObject  a json object that represents an airlines
-     * @return              an airline with its attributes
-     */
-    public Competition fromJson(JSONObject jsonObject) {
-        Competition competition = new Competition();
-        // Deserialize json into object fields
-        try {
-            competition.setName(jsonObject.getString("name"));
-            competition.setId(jsonObject.getString("dbid"));
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-        // Return new object
-        return competition;
-    }
-
-    /*
-    * Decodes array of airlines json results into airlines model objects
-    *
-    * @param   jsonArray  a json array that represents a list of airlines
-    * @return             void
-    */
-    public void fromJson(JSONArray jsonArray) {
-        JSONObject competitionsJSON;
-
-        competitionArrayList = new ArrayList<Competition>(jsonArray.length());
-
-        // Process each result in json array, decode and convert to airlines object
-        for (int i=0; i < jsonArray.length(); i++) {
-            try {
-                competitionsJSON = jsonArray.getJSONObject(i);
-            } catch (Exception e) {
-                e.printStackTrace();
-                continue;
-            }
-
-            Competition competition = fromJson(competitionsJSON);
-            if (competition != null) {
-                competitionArrayList.add(competition);
-            }
-        }
-    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

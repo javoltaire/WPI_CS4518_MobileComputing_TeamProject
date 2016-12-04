@@ -6,22 +6,28 @@ package com.example.tupac.myapplication.backend.models;
 
 public class Competition {
 
-    String name;
-    String id;
 
-    public String getId() {
-        return id;
+    int competitionId;
+    String competitionName;
+
+    public Competition() {
+        this.competitionId = 0;
+        this.competitionName = "Not a real competition";
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public int getCompetitionId() {
+        return competitionId;
     }
 
-    public String getName() {
-        return name;
+    public void setCompetitionId(int competitionId) {
+        this.competitionId = competitionId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getCompetitionName() {
+        return competitionName;
+    }
+
+    public void setCompetitionName(String competitionName) {
+        this.competitionName = competitionName;
     }
 }
