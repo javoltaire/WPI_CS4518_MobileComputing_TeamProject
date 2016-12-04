@@ -1,7 +1,4 @@
-package edu.wpi.goalify.models.venues;
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+package edu.wpi.goalify.models.teams.venue;
 
 /**
  * @author Jules Voltaire on 11/30/2016.
@@ -9,17 +6,11 @@ import com.google.gson.annotations.SerializedName;
  */
 public class Geolocation {
     //region Private variables
-    @SerializedName("latitude")
-    @Expose
     private double latitude;
-
-    @SerializedName("longitude")
-    @Expose
     private double longitude;
     //endregion
 
     //region Getters and Setters
-
     //region Latitude
     /**
      * @return The latitude
@@ -51,7 +42,6 @@ public class Geolocation {
         this.longitude = longitude;
     }
     //endregion
-
     //endregion
 
 
