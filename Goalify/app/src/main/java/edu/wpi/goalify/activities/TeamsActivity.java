@@ -40,6 +40,7 @@ public class TeamsActivity extends AppCompatActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        setTitle(R.string.my_teams);
     }
     //endregion
 }

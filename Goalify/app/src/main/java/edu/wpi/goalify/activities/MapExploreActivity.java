@@ -37,6 +37,7 @@ public class MapExploreActivity extends AppCompatActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        setTitle(R.string.explore);
     }
     //endregion
 

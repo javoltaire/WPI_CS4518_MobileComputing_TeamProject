@@ -37,6 +37,7 @@ public class NewTeamActivity extends AppCompatActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        setTitle(R.string.add_new_team);
     }
     //endregion
 }
