@@ -1,31 +1,32 @@
 package edu.wpi.goalify.models;
 
+/**
+ * @author Jules Voltaire on 12/5/2016. (Generated)
+ */
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-/**
- * @author Jules Voltaire on 12/5/2016. (Generated)
- */
+import edu.wpi.goalify.models.helpers.Geolocation;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({
         "name",
         "dbid",
-        "region",
-        "fullName",
+        "geolocation",
+        "isNational",
         "shortName"
 })
-public class League {
-
+public class Team {
     @JsonProperty("name")
     private String name;
     @JsonProperty("dbid")
     private int dbid;
-    @JsonProperty("region")
-    private String region;
-    @JsonProperty("fullName")
-    private String fullName;
+    @JsonProperty("geolocation")
+    private Geolocation geolocation;
+    @JsonProperty("isNational")
+    private boolean isNational;
     @JsonProperty("shortName")
     private String shortName;
 
@@ -72,41 +73,41 @@ public class League {
     /**
      *
      * @return
-     * The region
+     * The geolocation
      */
-    @JsonProperty("region")
-    public String getRegion() {
-        return region;
+    @JsonProperty("geolocation")
+    public Geolocation getGeolocation() {
+        return geolocation;
     }
 
     /**
      *
-     * @param region
-     * The region
+     * @param geolocation
+     * The geolocation
      */
-    @JsonProperty("region")
-    public void setRegion(String region) {
-        this.region = region;
+    @JsonProperty("geolocation")
+    public void setGeolocation(Geolocation geolocation) {
+        this.geolocation = geolocation;
     }
 
     /**
      *
      * @return
-     * The fullName
+     * The isNational
      */
-    @JsonProperty("fullName")
-    public String getFullName() {
-        return fullName;
+    @JsonProperty("isNational")
+    public boolean isIsNational() {
+        return isNational;
     }
 
     /**
      *
-     * @param fullName
-     * The fullName
+     * @param isNational
+     * The isNational
      */
-    @JsonProperty("fullName")
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    @JsonProperty("isNational")
+    public void setIsNational(boolean isNational) {
+        this.isNational = isNational;
     }
 
     /**
@@ -128,4 +129,5 @@ public class League {
     public void setShortName(String shortName) {
         this.shortName = shortName;
     }
+
 }

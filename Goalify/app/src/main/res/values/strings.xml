@@ -1,5 +1,18 @@
 <resources>
     <string name="app_name">Goalify</string>
+
+    <!-- Strings for New Team Activity -->
+    <string name="label_leagues">Leagues</string>
+    <string name="label_local_teams">Local Teams</string>
+    <string name="label_search_result_for">Result for</string>
+
+
+
+
+
+
+
+
     <string name="my_teams">My teams</string>
     <string name="explore">Explore</string>
     <string name="settings">Settings</string>
@@ -83,6 +96,7 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+
 
 
 </resources>
