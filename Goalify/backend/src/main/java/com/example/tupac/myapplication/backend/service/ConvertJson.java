@@ -1,6 +1,7 @@
 package com.example.tupac.myapplication.backend.service;
 
 import com.example.tupac.myapplication.backend.models.Competition;
+import com.example.tupac.myapplication.backend.models.Match;
 import com.example.tupac.myapplication.backend.models.Round;
 import com.example.tupac.myapplication.backend.models.Team;
 import com.example.tupac.myapplication.backend.models.TeamLocation;
@@ -9,7 +10,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by tupac on 12/4/2016.
@@ -21,6 +24,7 @@ public class ConvertJson {
     static ArrayList<Competition> competitionArrayList;
     static ArrayList<Round> roundArrayList;
     static ArrayList<Team> teamArrayList;
+    static ArrayList<Match> matchArrayList;
 
     /*
      * Decodes competition json into competition model object
@@ -55,7 +59,7 @@ public class ConvertJson {
         competitionArrayList = new ArrayList<Competition>(jsonArray.length());
 
         // Process each result in json array, decode and convert to competition object
-        for (int i=0; i < jsonArray.length(); i++) {
+        for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 competitionsJSON = jsonArray.getJSONObject(i);
             } catch (Exception e) {
@@ -84,7 +88,7 @@ public class ConvertJson {
         roundArrayList = new ArrayList<Round>(roundList.length());
 
         // Process each result in json array, decode and convert to round object
-        for (int i=0; i < roundList.length(); i++) {
+        for (int i = 0; i < roundList.length(); i++) {
             try {
                 roundJSON = roundList.getJSONObject(i);
             } catch (Exception e) {
@@ -135,7 +139,7 @@ public class ConvertJson {
         teamArrayList = new ArrayList<Team>(teamList.length());
 
         // Process each result in json array, decode and convert to team object
-        for (int i=0; i < teamList.length(); i++) {
+        for (int i = 0; i < teamList.length(); i++) {
             try {
                 teamsJSON = teamList.getJSONObject(i);
             } catch (Exception e) {
@@ -151,12 +155,12 @@ public class ConvertJson {
         return teamArrayList;
     }
 
-     /*
-    * Decodes teams json into teams model object
-    *
-    * @param   jsonObject  a json object that represents a team
-    * @return              a team with its attributes
-    */
+    /*
+   * Decodes teams json into teams model object
+   *
+   * @param   jsonObject  a json object that represents a team
+   * @return              a team with its attributes
+   */
     private static Team getTeamfromJson(JSONObject teamsJSON) {
         Team team = new Team();
         // Deserialize json into object fields
@@ -193,5 +197,63 @@ public class ConvertJson {
     }
 
 
+    /*
+   * Decodes array of matches json results into match model objects
+   *
+   * @param   jsonArray  a json array that represents a list of matches
+   * @return             array list of matches
+   */
+    public static ArrayList<Match> getMatchfromJson(JSONArray matchlist) {
 
+        JSONObject matchJSON;
+
+        matchArrayList = new ArrayList<Match>(matchlist.length());
+
+        // Process each result in json array, decode and convert to match object
+        for (int i = 0; i < matchlist.length(); i++) {
+            try {
+                matchJSON = matchlist.getJSONObject(i);
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            Match match = getMatchfromJson(matchJSON);
+            if (match != null) {
+                matchArrayList.add(match);
+            }
+        }
+        return matchArrayList;
+    }
+
+    /*
+    * Decodes match json into match model object
+    *
+    * @param   jsonObject  a json object that represents a match
+    * @return              a match with its attributes
+    */
+    private static Match getMatchfromJson(JSONObject matchJSON) {
+
+        Match match = new Match();
+        // Deserialize json into object fields
+        try {
+            match.setMatchId(matchJSON.getInt("dbid"));
+            match.setCompetition(getCompetitionfromJson(matchJSON.getJSONObject("competition")));
+            match.setHomeTeam(getTeamfromJson(matchJSON.getJSONObject("homeTeam")));
+            match.setAwayTeam(getTeamfromJson(matchJSON.getJSONObject("awayTeam")));
+            match.setHomeGoals(matchJSON.getInt("homeGoals"));
+            match.setAwayGoals(matchJSON.getInt("awayGoals"));
+
+            Double start = matchJSON.getDouble("start");
+            String startStr = new BigDecimal(start).toPlainString();
+            Date startDate = new Date(Long.parseLong(startStr));
+            match.setStartTime(startDate);
+
+        } catch (JSONException e) {
+            return match;
+        }
+        // Return new object
+        return match;
+    }
 }
+
