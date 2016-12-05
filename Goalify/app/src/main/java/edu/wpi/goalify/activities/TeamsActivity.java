@@ -7,12 +7,13 @@ import android.view.MenuItem;
 
 import edu.wpi.goalify.R;
 
-public class NewTeamActivity extends AppCompatActivity {
+public class TeamsActivity extends AppCompatActivity {
 
+    //region Overridden Methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_team);
+        setContentView(R.layout.activity_teams);
         setupActionBar();
     }
 
@@ -27,6 +28,8 @@ public class NewTeamActivity extends AppCompatActivity {
         }
     }
 
+    //endregion
+
     //region Private Methods
     /**
      * Set up the {@link android.app.ActionBar}, if the API is available.
@@ -37,7 +40,7 @@ public class NewTeamActivity extends AppCompatActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        setTitle(R.string.add_new_team);
+        setTitle(R.string.my_teams);
     }
     //endregion
 }
