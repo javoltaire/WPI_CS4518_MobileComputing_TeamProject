@@ -23,6 +23,12 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
+        <activity android:name=".activities.NewTeamActivity" />
+        <activity android:name=".activities.MapExploreActivity" />
+        <activity android:name=".activities.TeamsActivity" />
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

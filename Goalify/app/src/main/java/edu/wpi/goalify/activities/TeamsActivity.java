@@ -7,12 +7,13 @@ import android.view.MenuItem;
 
 import edu.wpi.goalify.R;
 
-public class NewTeamActivity extends AppCompatActivity {
+public class TeamsActivity extends AppCompatActivity {
 
+    //region Overridden Methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_team);
+        setContentView(R.layout.activity_teams);
         setupActionBar();
     }
 
@@ -26,6 +27,8 @@ public class NewTeamActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    //endregion
 
     //region Private Methods
     /**
