@@ -1,6 +1,7 @@
 package com.example.tupac.myapplication.backend;
 
 import com.example.tupac.myapplication.backend.models.Competition;
+import com.example.tupac.myapplication.backend.models.Match;
 import com.example.tupac.myapplication.backend.models.Round;
 import com.example.tupac.myapplication.backend.models.Team;
 import com.example.tupac.myapplication.backend.service.ConvertJson;
@@ -9,6 +10,11 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,11 +24,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -39,15 +47,19 @@ import javax.xml.ws.spi.http.HttpHandler;
  */
 
 public class MyServlet extends HttpServlet {
-    static Logger Log = Logger.getLogger("com.example.[USERNAME].myapplication.backend.MyServlet");
+    static Logger Log = Logger.getLogger("com.example.tupac.myapplication.backend.MyServlet");
 
     private DatabaseReference firebase;
 
     ArrayList<Competition> competitionArrayList;
     ArrayList<Round> roundArrayList;
     ArrayList<Team> teamArrayList;
+    ArrayList<Match> matchArrayList;
 
     FirebaseDatabase database;
+
+    private String SERVER_KEY = "AAAALHg9Clg:APA91bEFAgnZ-6Ch1J9e49k68SlJswfw8hBBwKHfxG8vQYsVzaKVwyx_tpazifVLxLjjtmv-RN4hcbEuG9W7Bgsa0hltpeuYQbJIq6euO2E7QZGQK2_fZ3m13m1OXfosHTAtOEtIwmYciB0xnPIMwZ0JQhDdzTe8SA";
+    private String token="";
 
 
     @Override
@@ -77,7 +89,7 @@ public class MyServlet extends HttpServlet {
             throws IOException {
 
         String outString;
-        outString = "<p>Team_id, Name, Latitude, Longitude</p>";
+        outString = "<p>Match Id, Competition Name, Home Team, Away Team, Start Time</p>";
 
         resp.getWriter().println(outString);
 
@@ -90,6 +102,8 @@ public class MyServlet extends HttpServlet {
 
         String rounds = "/rounds";
         String teams = "/teams?round_ids=&competition_ids=2";
+        String matches = "/matches?team_id=7&round_ids=1044&competition_ids=2";
+        String matchDetails = "/matches/69407";
 
 //        String competitionsJsonStr = sh.makeServiceCall(mainUrl + competitions);
 //
@@ -120,20 +134,50 @@ public class MyServlet extends HttpServlet {
 //        }
 
 
-        String teamsJsonStr = sh.makeServiceCall(mainUrl + teams);
+//        String teamsJsonStr = sh.makeServiceCall(mainUrl + teams);
+//
+//        if (teamsJsonStr != null) {
+//            try {
+//                //resp.getWriter().println(teamsJsonStr);
+//                // Getting JSON Array node
+//                JSONArray teamList = new JSONArray(teamsJsonStr);
+//                //use service class to parse this json array and create a team model
+//                teamArrayList = ConvertJson.getTeamfromJson(teamList);
+//
+//            } catch (final JSONException e) {
+//
+//            }
+//        }
 
-        if (teamsJsonStr != null) {
+        String matchesJsonStr = sh.makeServiceCall(mainUrl + matches);
+
+        if (matchesJsonStr != null) {
             try {
-                //resp.getWriter().println(teamsJsonStr);
+                //resp.getWriter().println(matchesJsonStr);
                 // Getting JSON Array node
-                JSONArray teamList = new JSONArray(teamsJsonStr);
-                //use service class to parse this json array and create a team model
-                teamArrayList = ConvertJson.getTeamfromJson(teamList);
+                JSONArray matchlist = new JSONArray(matchesJsonStr);
+                //use service class to parse this json array and create a match model
+                matchArrayList = ConvertJson.getMatchfromJson(matchlist);
 
             } catch (final JSONException e) {
 
             }
         }
+
+//        String matchDetailsJsonStr = sh.makeServiceCall(mainUrl + matchDetails);
+//
+//        if (matchDetailsJsonStr != null) {
+//            try {
+//                resp.getWriter().println(matchDetailsJsonStr);
+//                // Getting JSON Array node
+//                JSONArray matchlist = new JSONArray(matchDetailsJsonStr);
+//                //use service class to parse this json array and create a match model
+//                //matchArrayList = ConvertJson.getMatchfromJson(matchlist);
+//
+//            } catch (final JSONException e) {
+//
+//            }
+//        }
 
         if (competitionArrayList != null) {
             for (int i=0; i<competitionArrayList.size(); i++){
@@ -161,11 +205,24 @@ public class MyServlet extends HttpServlet {
             }
         }
 
+        if (matchArrayList != null) {
+            for (int i=0; i<matchArrayList.size(); i++){
+
+                resp.getWriter().println("<p>" +  matchArrayList.get(i).getMatchId() + "&nbsp;&nbsp;&nbsp;"  +
+                        matchArrayList.get(i).getCompetition().getCompetitionName() + "&nbsp;&nbsp;&nbsp;"  +
+                        matchArrayList.get(i).getHomeTeam().getTeamName() + "&nbsp;&nbsp;&nbsp;"  +
+                        matchArrayList.get(i).getHomeGoals() + "&nbsp;&nbsp;&nbsp;"  +
+                        matchArrayList.get(i).getAwayGoals() + "&nbsp;&nbsp;&nbsp;" +
+                        matchArrayList.get(i).getAwayTeam().getTeamName()  + "&nbsp;&nbsp;&nbsp;" +
+                        matchArrayList.get(i).getStartTime() + "<p>");
+            }
+        }
+
         database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference();
 
         /*
-         * use this only once to populate
+         * use this only once to populate teams
          */
 //        DatabaseReference teamRef = ref.child("teams");
 //
@@ -180,6 +237,23 @@ public class MyServlet extends HttpServlet {
 //
 //        teamRef.setValue(teamsMap);
 
+         /*
+         * use this only once to populate matches
+         */
+//        DatabaseReference matchesRef = ref.child("matches");
+//
+//        Map<String, Match> matchesMap = new HashMap<String, Match>();
+//
+//        if (matchArrayList != null) {
+//            for (int i=0; i<matchArrayList.size(); i++){
+//                Match match = matchArrayList.get(i);
+//                matchesMap.put(match.getHomeTeam().getTeamName() + " vs " + match.getAwayTeam().getTeamName(), new Match(match.getAwayGoals(), match.getAwayTeam(), match.getCompetition(),
+//                        match.getHomeGoals(), match.getHomeTeam(), match.getMatchId(), match.getStartTime()));
+//            }
+//        }
+//
+//        matchesRef.setValue(matchesMap);
+
 
 
     }
@@ -187,7 +261,30 @@ public class MyServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        //issue a post request
 
+
+        HttpClient httpclient = HttpClients.createDefault();
+        HttpPost httppost = new HttpPost("https://fcm.googleapis.com/fcm/send");
+        httppost.addHeader("Authorization", SERVER_KEY);
+        httppost.addHeader("Content-Type", "application/json");
+
+
+        JSONObject body = new JSONObject();
+        //body.put("to", token);
+
+        //Execute and get the response.
+        HttpResponse response = httpclient.execute(httppost);
+        HttpEntity entity = response.getEntity();
+
+        if (entity != null) {
+            InputStream instream = entity.getContent();
+            try {
+                // do something useful
+            } finally {
+                instream.close();
+            }
+        }
     }
 
 
