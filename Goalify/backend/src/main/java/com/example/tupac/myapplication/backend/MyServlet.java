@@ -5,6 +5,7 @@ import com.example.tupac.myapplication.backend.models.Match;
 import com.example.tupac.myapplication.backend.models.Round;
 import com.example.tupac.myapplication.backend.models.Team;
 import com.example.tupac.myapplication.backend.service.ConvertJson;
+import com.google.appengine.repackaged.com.google.api.client.json.Json;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DatabaseReference;
@@ -14,6 +15,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,15 +28,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -40,10 +40,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.ws.spi.http.HttpHandler;
+
 
 /**
  * @author Rupak Lamsal
+ *
+ * This is a servlet class that is the back end of the application. It will talk to the CrowdScores API, collect Json data,
+ * parse them and make required model classes, for instance, teams, matches, etc. The model classes will then be stored in
+ * the firebase database where the client app can access the info from. This servlet will also be used to push notification
+ * to the client app using the Firebase Messaging.
+ *
  */
 
 public class MyServlet extends HttpServlet {
@@ -59,7 +65,8 @@ public class MyServlet extends HttpServlet {
     FirebaseDatabase database;
 
     private String SERVER_KEY = "AAAALHg9Clg:APA91bEFAgnZ-6Ch1J9e49k68SlJswfw8hBBwKHfxG8vQYsVzaKVwyx_tpazifVLxLjjtmv-RN4hcbEuG9W7Bgsa0hltpeuYQbJIq6euO2E7QZGQK2_fZ3m13m1OXfosHTAtOEtIwmYciB0xnPIMwZ0JQhDdzTe8SA";
-    private String token="";
+    private String token="fX9_n4W0QPo:APA91bEhx7uK6DKT8LL-ZNM0_kwLIzPSMT5lA8MXHICBsiMbgdD_Vaf13M2lRPvRl2hq_91VKzjdih09HyPZt8l60vG3iarIqhAmk91-LouZK_vVBLS9whQ8uA56ulY_UTTcnXCj0UlA";
+
 
 
     @Override
@@ -68,8 +75,6 @@ public class MyServlet extends HttpServlet {
 
         String credential = config.getInitParameter("credential");
         String databaseURL = config.getInitParameter("databaseUrl");
-
-        Log.info(credential);
 
         // Note: Ensure that the [PRIVATE_KEY_FILENAME].json has read
         // permissions set.
@@ -93,17 +98,27 @@ public class MyServlet extends HttpServlet {
 
         resp.getWriter().println(outString);
 
+        doPost(req,resp);
 
-        HttpHandler sh = new HttpHandler();
-        // Making a request to url and getting response
-        String mainUrl = "https://api.crowdscores.com/v1";
-        String competitions = "/competitions";
-        //competition_id for Premier League is 2
 
-        String rounds = "/rounds";
-        String teams = "/teams?round_ids=&competition_ids=2";
-        String matches = "/matches?team_id=7&round_ids=1044&competition_ids=2";
-        String matchDetails = "/matches/69407";
+        database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference();
+
+
+        /*
+         * use the following commented code only once to populate info in the firebase database
+         */
+
+//        HttpHandler sh = new HttpHandler();
+//        // Making a request to url and getting response
+//        String mainUrl = "https://api.crowdscores.com/v1";
+//        String competitions = "/competitions";
+//        //competition_id for Premier League is 2
+//
+//        String rounds = "/rounds";
+//        String teams = "/teams?round_ids=&competition_ids=2";
+//        String matches = "/matches?team_id=7&round_ids=1044&competition_ids=2";
+//        String matchDetails = "/matches/69407";
 
 //        String competitionsJsonStr = sh.makeServiceCall(mainUrl + competitions);
 //
@@ -149,20 +164,20 @@ public class MyServlet extends HttpServlet {
 //            }
 //        }
 
-        String matchesJsonStr = sh.makeServiceCall(mainUrl + matches);
-
-        if (matchesJsonStr != null) {
-            try {
-                //resp.getWriter().println(matchesJsonStr);
-                // Getting JSON Array node
-                JSONArray matchlist = new JSONArray(matchesJsonStr);
-                //use service class to parse this json array and create a match model
-                matchArrayList = ConvertJson.getMatchfromJson(matchlist);
-
-            } catch (final JSONException e) {
-
-            }
-        }
+//        String matchesJsonStr = sh.makeServiceCall(mainUrl + matches);
+//
+//        if (matchesJsonStr != null) {
+//            try {
+//                //resp.getWriter().println(matchesJsonStr);
+//                // Getting JSON Array node
+//                JSONArray matchlist = new JSONArray(matchesJsonStr);
+//                //use service class to parse this json array and create a match model
+//                matchArrayList = ConvertJson.getMatchfromJson(matchlist);
+//
+//            } catch (final JSONException e) {
+//
+//            }
+//        }
 
 //        String matchDetailsJsonStr = sh.makeServiceCall(mainUrl + matchDetails);
 //
@@ -178,52 +193,46 @@ public class MyServlet extends HttpServlet {
 //
 //            }
 //        }
+//
+//        if (competitionArrayList != null) {
+//            for (int i=0; i<competitionArrayList.size(); i++){
+//                resp.getWriter().println("<p>" +  competitionArrayList.get(i).getCompetitionId() + "&nbsp;&nbsp;&nbsp;" +
+//                        competitionArrayList.get(i).getCompetitionName() + "<p>");
+//
+//            }
+//        }
+//
+//        if (roundArrayList != null) {
+//            for (int i=0; i<roundArrayList.size(); i++){
+//                resp.getWriter().println("<p>" +  roundArrayList.get(i).getRoundId()  + "&nbsp;&nbsp;&nbsp;" +
+//                        roundArrayList.get(i).getCompetition().getCompetitionId() + "&nbsp;&nbsp;&nbsp;" +
+//                        roundArrayList.get(i).getCompetition().getCompetitionName() + "<p>");
+//
+//            }
+//        }
+//
+//        if (teamArrayList != null) {
+//            for (int i=0; i<teamArrayList.size(); i++){
+//                resp.getWriter().println("<p>" +  teamArrayList.get(i).getTeamId() + "      "  +
+//                        teamArrayList.get(i).getTeamName() + "      "  +
+//                        teamArrayList.get(i).getTeamLocation().getTeamLatitude() + "      "  +
+//                        teamArrayList.get(i).getTeamLocation().getTeamLatitude() + "<p>");
+//            }
+//        }
+//
+//        if (matchArrayList != null) {
+//            for (int i=0; i<matchArrayList.size(); i++){
+//
+//                resp.getWriter().println("<p>" +  matchArrayList.get(i).getMatchId() + "&nbsp;&nbsp;&nbsp;"  +
+//                        matchArrayList.get(i).getCompetition().getCompetitionName() + "&nbsp;&nbsp;&nbsp;"  +
+//                        matchArrayList.get(i).getHomeTeam().getTeamName() + "&nbsp;&nbsp;&nbsp;"  +
+//                        matchArrayList.get(i).getHomeGoals() + "&nbsp;&nbsp;&nbsp;"  +
+//                        matchArrayList.get(i).getAwayGoals() + "&nbsp;&nbsp;&nbsp;" +
+//                        matchArrayList.get(i).getAwayTeam().getTeamName()  + "&nbsp;&nbsp;&nbsp;" +
+//                        matchArrayList.get(i).getStartTime() + "<p>");
+//            }
+//        }
 
-        if (competitionArrayList != null) {
-            for (int i=0; i<competitionArrayList.size(); i++){
-                resp.getWriter().println("<p>" +  competitionArrayList.get(i).getCompetitionId() + "&nbsp;&nbsp;&nbsp;" +
-                        competitionArrayList.get(i).getCompetitionName() + "<p>");
-
-            }
-        }
-
-        if (roundArrayList != null) {
-            for (int i=0; i<roundArrayList.size(); i++){
-                resp.getWriter().println("<p>" +  roundArrayList.get(i).getRoundId()  + "&nbsp;&nbsp;&nbsp;" +
-                        roundArrayList.get(i).getCompetition().getCompetitionId() + "&nbsp;&nbsp;&nbsp;" +
-                        roundArrayList.get(i).getCompetition().getCompetitionName() + "<p>");
-
-            }
-        }
-
-        if (teamArrayList != null) {
-            for (int i=0; i<teamArrayList.size(); i++){
-                resp.getWriter().println("<p>" +  teamArrayList.get(i).getTeamId() + "      "  +
-                        teamArrayList.get(i).getTeamName() + "      "  +
-                        teamArrayList.get(i).getTeamLocation().getTeamLatitude() + "      "  +
-                        teamArrayList.get(i).getTeamLocation().getTeamLatitude() + "<p>");
-            }
-        }
-
-        if (matchArrayList != null) {
-            for (int i=0; i<matchArrayList.size(); i++){
-
-                resp.getWriter().println("<p>" +  matchArrayList.get(i).getMatchId() + "&nbsp;&nbsp;&nbsp;"  +
-                        matchArrayList.get(i).getCompetition().getCompetitionName() + "&nbsp;&nbsp;&nbsp;"  +
-                        matchArrayList.get(i).getHomeTeam().getTeamName() + "&nbsp;&nbsp;&nbsp;"  +
-                        matchArrayList.get(i).getHomeGoals() + "&nbsp;&nbsp;&nbsp;"  +
-                        matchArrayList.get(i).getAwayGoals() + "&nbsp;&nbsp;&nbsp;" +
-                        matchArrayList.get(i).getAwayTeam().getTeamName()  + "&nbsp;&nbsp;&nbsp;" +
-                        matchArrayList.get(i).getStartTime() + "<p>");
-            }
-        }
-
-        database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference();
-
-        /*
-         * use this only once to populate teams
-         */
 //        DatabaseReference teamRef = ref.child("teams");
 //
 //        Map<String, Team> teamsMap = new HashMap<String, Team>();
@@ -260,18 +269,32 @@ public class MyServlet extends HttpServlet {
 
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        resp.getWriter().println("*********************post****************************");
+
+
         //issue a post request
-
-
-        HttpClient httpclient = HttpClients.createDefault();
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpPost httppost = new HttpPost("https://fcm.googleapis.com/fcm/send");
-        httppost.addHeader("Authorization", SERVER_KEY);
+
+        //add headers
+        httppost.addHeader("Authorization", "key=" + SERVER_KEY);
         httppost.addHeader("Content-Type", "application/json");
 
+        //create json body
+        JSONObject notification = new JSONObject();
+        notification.put("title", "Chelsea vs Arsenal");
+        notification.put("body", "Match begins in 10 mins");
 
         JSONObject body = new JSONObject();
-        //body.put("to", token);
+        body.put("to", "/topics/Chelsea");
+        body.put("notification", notification);
+
+        StringEntity params = new StringEntity(body.toString());
+
+        //add the body
+        httppost.setEntity(params);
 
         //Execute and get the response.
         HttpResponse response = httpclient.execute(httppost);
@@ -281,10 +304,14 @@ public class MyServlet extends HttpServlet {
             InputStream instream = entity.getContent();
             try {
                 // do something useful
+                resp.getWriter().println(instream.toString());
             } finally {
                 instream.close();
             }
         }
+
+
+
     }
 
 
