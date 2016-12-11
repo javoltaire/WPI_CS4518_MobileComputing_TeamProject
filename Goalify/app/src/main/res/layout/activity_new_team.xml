@@ -17,30 +17,31 @@
         android:layout_height="wrap_content">
 
         <EditText
+            android:id="@+id/editText_search_team_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
-            android:text="Name"
+            android:hint="@string/editText_hint_search_team"
             android:ems="10"
-            android:id="@+id/editText"
             android:layout_weight="1" />
 
         <Button
-            android:text="Button"
+            android:id="@+id/button_search_team_name"
+            android:text="@string/button_text_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/button2"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:onClick="buttonSearchTeamsOnClick"/>
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/local_teams_and_leagues_container"
+        android:id="@+id/linearLayout_locals_and_leagues"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
         <TextView
-            android:text="@string/label_local_teams"
+            android:text="@string/text_local_teams"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -49,7 +50,7 @@
             android:layout_height="wrap_content" />
 
         <TextView
-            android:text="@string/label_leagues"
+            android:text="@string/text_leagues"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -59,17 +60,17 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/teams_search_results_container"
+        android:id="@+id/linearLayout_teams_search_results"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
         android:orientation="vertical">
         <TextView
-            android:text="@string/label_leagues"
+            android:text="@string/text_search_result_for"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <ListView
-            android:id="@+id/teamsSearchResultListView"
+            android:id="@+id/ListView_teams_result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </ListView>

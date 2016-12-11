@@ -2,9 +2,12 @@
     <string name="app_name">Goalify</string>
 
     <!-- Strings for New Team Activity -->
-    <string name="label_leagues">Leagues</string>
-    <string name="label_local_teams">Local Teams</string>
-    <string name="label_search_result_for">Result for</string>
+    <string name="editText_hint_search_team">e.g. Chelsea</string>
+    <string name="button_text_search">Search</string>
+
+    <string name="text_leagues">Leagues</string>
+    <string name="text_local_teams">Local Teams</string>
+    <string name="text_search_result_for">Result for</string>
 
 
 
