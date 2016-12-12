@@ -3,6 +3,7 @@ package edu.wpi.goalify.activities;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.goalify.R;
+import edu.wpi.goalify.simplemodels.Team;
 
 public class NewTeamActivity extends AppCompatActivity {
     //region private final strings
@@ -96,6 +98,8 @@ public class NewTeamActivity extends AppCompatActivity {
         queryReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Team team = dataSnapshot.getValue(Team.class);
+                Log.e("Team", team.getTeamName());
                 objs.add(dataSnapshot.getChildrenCount());
             }
 
