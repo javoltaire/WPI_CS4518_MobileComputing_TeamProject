@@ -1,24 +1,28 @@
-package com.example.tupac.myapplication.backend;
+package com.example.tupac.myapplication.backend.servlets;
 
 import com.example.tupac.myapplication.backend.models.Competition;
+import com.example.tupac.myapplication.backend.models.FollowedTeam;
 import com.example.tupac.myapplication.backend.models.Match;
 import com.example.tupac.myapplication.backend.models.Round;
 import com.example.tupac.myapplication.backend.models.Team;
 import com.example.tupac.myapplication.backend.service.ConvertJson;
-import com.google.appengine.repackaged.com.google.api.client.json.Json;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +37,9 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Timer;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -53,7 +60,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 
 public class MyServlet extends HttpServlet {
-    static Logger Log = Logger.getLogger("com.example.tupac.myapplication.backend.MyServlet");
+    static Logger Log = Logger.getLogger("com.example.tupac.myapplication.backend.servlets.MyServlet");
 
     private DatabaseReference firebase;
 
@@ -61,12 +68,10 @@ public class MyServlet extends HttpServlet {
     ArrayList<Round> roundArrayList;
     ArrayList<Team> teamArrayList;
     ArrayList<Match> matchArrayList;
+    ArrayList<FollowedTeam> followedTeamArrayList;
+
 
     FirebaseDatabase database;
-
-    private String SERVER_KEY = "AAAALHg9Clg:APA91bEFAgnZ-6Ch1J9e49k68SlJswfw8hBBwKHfxG8vQYsVzaKVwyx_tpazifVLxLjjtmv-RN4hcbEuG9W7Bgsa0hltpeuYQbJIq6euO2E7QZGQK2_fZ3m13m1OXfosHTAtOEtIwmYciB0xnPIMwZ0JQhDdzTe8SA";
-    private String token="fX9_n4W0QPo:APA91bEhx7uK6DKT8LL-ZNM0_kwLIzPSMT5lA8MXHICBsiMbgdD_Vaf13M2lRPvRl2hq_91VKzjdih09HyPZt8l60vG3iarIqhAmk91-LouZK_vVBLS9whQ8uA56ulY_UTTcnXCj0UlA";
-
 
 
     @Override
@@ -84,31 +89,182 @@ public class MyServlet extends HttpServlet {
                 .build();
 
         FirebaseApp.initializeApp(options);
-
         firebase = FirebaseDatabase.getInstance().getReference();
+        database = FirebaseDatabase.getInstance();
+
+         /*
+         * code used to create followed teams in firebase
+         */
+//        followedTeamArrayList=new ArrayList<>();
+//        FollowedTeam ft = new FollowedTeam();
+//        ft.setTeamId(7);
+//        ft.setTeamName("Chelsea");
+//        followedTeamArrayList.add(ft);
+//        DatabaseReference followedTeamsRef = database.getReference().child("followedTeams");
+//        Map<String, FollowedTeam> teamsMap = new HashMap<String, FollowedTeam>();
+//        if(followedTeamArrayList!=null)
+//        {
+//            for (int i = 0; i < followedTeamArrayList.size(); i++) {
+//                FollowedTeam team = followedTeamArrayList.get(i);
+//                teamsMap.put(String.valueOf(team.getTeamId()), new FollowedTeam(team.getTeamId(), team.getTeamName()));
+//            }
+//        }
+//
+//        followedTeamsRef.setValue(teamsMap);
+
+
+        /*
+         * gets initiated if user follows a team; reacts by downloading games in the next week for that team.
+         * stores that data in firebase database
+         */
+//        followedTeamArrayList = new ArrayList<>();
+//        DatabaseReference followedTeamsRef = database.getReference("followedTeams");
+//        followedTeamsRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    //getting data from snapshot
+//                    FollowedTeam followedTeam = snapshot.getValue(FollowedTeam.class); //do get using this team name for the next week
+//                    System.out.println("Followed team -> " + followedTeam.getTeamName());
+//
+//                    getMatchesFromApi(followedTeam.getTeamId());
+//
+//                    followedTeamArrayList.add(followedTeam);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+
+        DatabaseReference ref = database.getReference();
+
+        Map<String, Match> matchesMap = new HashMap<String, Match>();
+
+        matchArrayList = new ArrayList<>();
+        Match match = new Match(100, "Test1",200, "Test2", 17, 1481604300);
+        matchArrayList.add(match);
+        if (matchArrayList != null) {
+            for (int i=0; i<matchArrayList.size(); i++){
+                Match m = matchArrayList.get(i);
+                matchesMap.put(m.getHomeTeamName() + " vs " + match.getAwayTeamName(), m);
+            }
+        }
+
+        ref.child("matches").setValue(matchesMap);
+
+        DatabaseReference matchesRef = database.getReference("matches");
+
+        matchesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    //getting data from snapshot
+                    Match match = snapshot.getValue(Match.class);
+                    System.out.println("Matches -> " + match.getStartTime());
+
+                    long currentTime = System.currentTimeMillis();
+                    //long fiveMins = 5 * 60; //in sec
+
+                    long delayTime = match.getStartTime() * 1000 - currentTime;
+                    System.out.println("CurrentTime: " + currentTime + "MatchTime: " + match.getStartTime() +
+                        "delayTime: " + delayTime);
+
+                    //Now create a new task with delayed execution
+                    Queue queue = QueueFactory.getQueue("notification-queue");
+                    queue.add(TaskOptions.Builder.withUrl("/notifications").param("teamName", String.valueOf(match.getAwayTeamName()))
+                            .countdownMillis(delayTime));
+//                    queue.add(TaskOptions.Builder.withUrl("/notifications").param("team", String.valueOf(match.getHomeTeamName()))
+//                            .countdownMillis(delayTime));
+                    System.out.println("Successfully created a Task in the Queue");
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+    private void getMatchesFromApi(int teamId) {
+
+        String matches = "/matches?team_id=" + teamId +
+                "&round_ids=1044&competition_ids=2&from=2016-12-12T12:00:00-12:00&to=2016-12-20T12:00:00-12:00";
+
+        // Making a request to url and getting response
+        String mainUrl = "https://api.crowdscores.com/v1";
+
+        HttpHandler sh = new HttpHandler();
+
+        String matchesJsonStr = sh.makeServiceCall(mainUrl + matches);
+
+        if (matchesJsonStr != null) {
+            try {
+                //resp.getWriter().println(matchesJsonStr);
+                // Getting JSON Array node
+                JSONArray matchlist = new JSONArray(matchesJsonStr);
+                //use service class to parse this json array and create a match model
+                matchArrayList = ConvertJson.getMatchfromJson(matchlist);
+
+            } catch (final JSONException e) {
+
+            }
+        }
+
+        if (matchArrayList != null) {
+            for (int i=0; i<matchArrayList.size(); i++){
+
+                System.out.println( matchArrayList.get(i).getMatchId() + "      "  +
+                        matchArrayList.get(i).getHomeTeamName() + "     "  +
+                        matchArrayList.get(i).getHomeGoals() + "    "  +
+                        matchArrayList.get(i).getAwayGoals() + "    " +
+                        matchArrayList.get(i).getAwayTeamName()  + "    " +
+                        matchArrayList.get(i).getStartTime());
+            }
+        }
+
+
+        DatabaseReference ref = database.getReference();
+
+        Map<String, Match> matchesMap = new HashMap<String, Match>();
+
+        if (matchArrayList != null) {
+            for (int i=0; i<matchArrayList.size(); i++){
+                Match match = matchArrayList.get(i);
+                matchesMap.put(match.getHomeTeamName() + " vs " + match.getAwayTeamName(), new Match(match.getAwayGoals(), match.getAwayTeamName(),
+                        match.getHomeGoals(), match.getHomeTeamName(), match.getMatchId(), match.getStartTime()));
+            }
+        }
+
+        ref.child("matches").setValue(matchesMap);
 
     }
+
+
+
+
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
 
-        String outString;
-        outString = "<p>Match Id, Competition Name, Home Team, Away Team, Start Time</p>";
 
-        resp.getWriter().println(outString);
-
-        doPost(req,resp);
-
-
-        database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference();
-
-
-        /*
-         * use the following commented code only once to populate info in the firebase database
-         */
-
+//        String outString;
+//        outString = "<p>Match Id, Home Team, Away Team, Start Time</p>";
+//
+//        resp.getWriter().println(outString);
+//
+//        //doPost(req,resp);
+//
+//        /*
+//         * use the following commented code only once to populate info in the firebase database
+//         */
+//
 //        HttpHandler sh = new HttpHandler();
 //        // Making a request to url and getting response
 //        String mainUrl = "https://api.crowdscores.com/v1";
@@ -118,6 +274,7 @@ public class MyServlet extends HttpServlet {
 //        String rounds = "/rounds";
 //        String teams = "/teams?round_ids=&competition_ids=2";
 //        String matches = "/matches?team_id=7&round_ids=1044&competition_ids=2";
+//        String chelseaMatches = "/matches?team_id=7&round_ids=1044&competition_ids=2&from=2016-12-12T12:00:00-12:00&to=2016-12-20T12:00:00-12:00";
 //        String matchDetails = "/matches/69407";
 
 //        String competitionsJsonStr = sh.makeServiceCall(mainUrl + competitions);
@@ -164,7 +321,7 @@ public class MyServlet extends HttpServlet {
 //            }
 //        }
 
-//        String matchesJsonStr = sh.makeServiceCall(mainUrl + matches);
+//        String matchesJsonStr = sh.makeServiceCall(mainUrl + chelseaMatches);
 //
 //        if (matchesJsonStr != null) {
 //            try {
@@ -224,11 +381,10 @@ public class MyServlet extends HttpServlet {
 //            for (int i=0; i<matchArrayList.size(); i++){
 //
 //                resp.getWriter().println("<p>" +  matchArrayList.get(i).getMatchId() + "&nbsp;&nbsp;&nbsp;"  +
-//                        matchArrayList.get(i).getCompetition().getCompetitionName() + "&nbsp;&nbsp;&nbsp;"  +
-//                        matchArrayList.get(i).getHomeTeam().getTeamName() + "&nbsp;&nbsp;&nbsp;"  +
+//                        matchArrayList.get(i).getHomeTeamName() + "&nbsp;&nbsp;&nbsp;"  +
 //                        matchArrayList.get(i).getHomeGoals() + "&nbsp;&nbsp;&nbsp;"  +
 //                        matchArrayList.get(i).getAwayGoals() + "&nbsp;&nbsp;&nbsp;" +
-//                        matchArrayList.get(i).getAwayTeam().getTeamName()  + "&nbsp;&nbsp;&nbsp;" +
+//                        matchArrayList.get(i).getAwayTeamName()  + "&nbsp;&nbsp;&nbsp;" +
 //                        matchArrayList.get(i).getStartTime() + "<p>");
 //            }
 //        }
@@ -256,61 +412,20 @@ public class MyServlet extends HttpServlet {
 //        if (matchArrayList != null) {
 //            for (int i=0; i<matchArrayList.size(); i++){
 //                Match match = matchArrayList.get(i);
-//                matchesMap.put(match.getHomeTeam().getTeamName() + " vs " + match.getAwayTeam().getTeamName(), new Match(match.getAwayGoals(), match.getAwayTeam(), match.getCompetition(),
-//                        match.getHomeGoals(), match.getHomeTeam(), match.getMatchId(), match.getStartTime()));
+//                matchesMap.put(match.getHomeTeamName() + " vs " + match.getAwayTeamName(), new Match(match.getAwayGoals(), match.getAwayTeamName(),
+//                        match.getHomeGoals(), match.getHomeTeamName(), match.getMatchId(), match.getStartTime()));
 //            }
 //        }
 //
 //        matchesRef.setValue(matchesMap);
-
-
+//
+//
 
     }
 
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
-        resp.getWriter().println("*********************post****************************");
-
-
-        //issue a post request
-        HttpClient httpclient = HttpClientBuilder.create().build();
-        HttpPost httppost = new HttpPost("https://fcm.googleapis.com/fcm/send");
-
-        //add headers
-        httppost.addHeader("Authorization", "key=" + SERVER_KEY);
-        httppost.addHeader("Content-Type", "application/json");
-
-        //create json body
-        JSONObject notification = new JSONObject();
-        notification.put("title", "Chelsea vs Arsenal");
-        notification.put("body", "Match begins in 10 mins");
-
-        JSONObject body = new JSONObject();
-        body.put("to", "/topics/Chelsea");
-        body.put("notification", notification);
-
-        StringEntity params = new StringEntity(body.toString());
-
-        //add the body
-        httppost.setEntity(params);
-
-        //Execute and get the response.
-        HttpResponse response = httpclient.execute(httppost);
-        HttpEntity entity = response.getEntity();
-
-        if (entity != null) {
-            InputStream instream = entity.getContent();
-            try {
-                // do something useful
-                resp.getWriter().println(instream.toString());
-            } finally {
-                instream.close();
-            }
-        }
-
-
 
     }
 

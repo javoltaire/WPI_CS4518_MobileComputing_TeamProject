@@ -1,32 +1,69 @@
 package edu.wpi.goalify.activities;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 import android.widget.Button;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import edu.wpi.goalify.R;
+import edu.wpi.goalify.adapters.LeaguesAdapter;
+import edu.wpi.goalify.adapters.TeamsAdapter;
+import edu.wpi.goalify.dataservice.FirebaseUtil;
+import edu.wpi.goalify.models.League;
+import edu.wpi.goalify.models.Team;
 
 public class NewTeamActivity extends AppCompatActivity {
+    //region Constants
+    public static final String TEAM_ID = "team_id";
+    //endregion
 
+    //region Private View Instances
+    private EditText mTeamNameEditText;
+    private Button mClearSearchButton;
+
+
+    private LinearLayout mLocalsAndLeaguesLinearLayout;
+    private ListView mLeaguesListView;
+
+    private LinearLayout mTeamsSearchResultLinearLayout;
+    private TextView mTeamsSearchResultTitleTextView;
+    private ListView mTeamsSearchResultListView;
+    //endregion
+
+    //region Private variables
+    private TeamsAdapter mTeamsAdapter;
+    private LeaguesAdapter mLeaguesAdapter;
+    //endregion
+
+    //region Activity Overridden Methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_team);
         setupActionBar();
+        initControls();
+        getLeagues();
 
-        //used temporarily to subscribe to a topic for testing back end functionality
-        Button addFavBtn = (Button) findViewById(R.id.button2);
-        addFavBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseMessaging.getInstance().subscribeToTopic("Chelsea");
-            }
-        });
     }
 
     @Override
@@ -39,8 +76,70 @@ public class NewTeamActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+    //endregion
+
+    //region Event Handlers
+    public void btnClearSearchOnClick(View view){
+        if(mTeamsAdapter != null)
+            mTeamsAdapter.clear();
+        mTeamNameEditText.setText("");
+    }
+    //endregion
 
     //region Private Methods
+    private void initControls(){
+        mTeamNameEditText = (EditText) findViewById(R.id.editText_search_team_name);
+        mTeamNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String content = editable.toString();
+                if(content.length() <= 0){
+                    goToSearchMode(false);
+                }
+                else {
+                    goToSearchMode(true);
+                    searchTeams(content);
+                }
+            }
+        });
+        mClearSearchButton = (Button) findViewById(R.id.btn_clearSearch);
+
+        mLocalsAndLeaguesLinearLayout = (LinearLayout) findViewById(R.id.linearLayout_locals_and_leagues);
+        // Setting up the leagues list view
+        mLeaguesListView = (ListView) findViewById(R.id.ListView_Leagues);
+        mLeaguesAdapter = new LeaguesAdapter(this, new ArrayList<League>());
+        mLeaguesListView.setAdapter(mLeaguesAdapter);
+        mLeaguesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+                Intent teamIntent = new Intent(NewTeamActivity.this, TeamsActivity.class);
+                startActivity(teamIntent);
+            }
+        });
+
+        mTeamsSearchResultLinearLayout = (LinearLayout) findViewById(R.id.LinearLayout_teamsSearchResult);
+        mTeamsSearchResultTitleTextView = (TextView) findViewById(R.id.TextView_teamsSearchResultTitle);
+        // Setting up the teams search result listview
+        mTeamsSearchResultListView = (ListView) findViewById(R.id.ListView_teamsResult);
+        mTeamsAdapter = new TeamsAdapter(this, new ArrayList<Team>());
+        mTeamsSearchResultListView.setAdapter(mTeamsAdapter);
+        mTeamsSearchResultListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+                Intent teamIntent = new Intent(NewTeamActivity.this, TeamsActivity.class);
+                startActivity(teamIntent);
+            }
+        });
+    }
+
     /**
      * Set up the {@link android.app.ActionBar}, if the API is available.
      */
@@ -52,5 +151,68 @@ public class NewTeamActivity extends AppCompatActivity {
         }
         setTitle(R.string.add_new_team);
     }
+
+    private void goToTeamDetailActivity(long teamKey){
+        Intent teamDetailIntent = new Intent(this, TeamDetailActivity.class);
+//        teamDetailIntent.putExtra(TEAM_ID, teamKey);
+        startActivity(teamDetailIntent);
+    }
+
+    private void goToSearchMode(boolean b){
+        if(b){
+            mClearSearchButton.setVisibility(View.VISIBLE);
+            mLocalsAndLeaguesLinearLayout.setVisibility(View.GONE);
+            mTeamsSearchResultLinearLayout.setVisibility(View.VISIBLE);
+        }
+        else{
+            mLocalsAndLeaguesLinearLayout.setVisibility(View.VISIBLE);
+            mTeamsSearchResultLinearLayout.setVisibility(View.GONE);
+            mClearSearchButton.setVisibility(View.GONE);
+        }
+    }
+
+    //region Data Methods
+    private void getLeagues(){
+        mLeaguesAdapter.clear();
+
+        // TODO: Update to get leagues from firebase instead
+        // Getting leagues
+        League epl = new League("EPL");
+        mLeaguesAdapter.add(epl);
+        mLeaguesAdapter.notifyDataSetChanged();
+    }
+
+    private void getTeamsForLeague(long leagueId){
+
+    }
+
+    /**
+     * Submits a request to firebase to get a list of teams
+     * @param teamName The name of the team to search for.
+     */
+    private void searchTeams(String teamName){
+        mTeamsAdapter.clear();
+        Query queryReference = FirebaseUtil.getTeamsReference().orderByKey().startAt(teamName).endAt(teamName + "\uf8ff");
+        queryReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> snapShots = dataSnapshot.getChildren();
+                for(DataSnapshot snapshot : snapShots) {
+                    Team team = snapshot.getValue(Team.class);
+                    mTeamsAdapter.add(team);
+                }
+                mTeamsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        mTeamsSearchResultTitleTextView.setText(getString(R.string.text_search_result_for) + ": " + teamName);
+
+    }
+
+    //endregion
     //endregion
 }
