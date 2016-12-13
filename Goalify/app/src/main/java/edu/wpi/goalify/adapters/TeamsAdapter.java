@@ -51,30 +51,30 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
 
         Cursor cursor = dbHelper.getAllTeams();
 
-        if (cursor.moveToFirst()){
-            while(cursor.moveToNext()){
-                int teamID = cursor.getInt(0);
-                String teamName = cursor.getString(1);
-                double lat = cursor.getDouble(2);
-                double lon = cursor.getDouble(3);
 
-                Team t = new Team(teamID, teamName, new TeamLocation(lat, lon));
-                followedTeamArrayList.add(t);
-                System.out.println(followedTeamArrayList);
-                // do what ever you want here
-            }
+
+        if (cursor != null){
+                while (cursor.moveToNext()){
+                    int teamID = cursor.getInt(0);
+                    String teamName = cursor.getString(1);
+                    double lat = cursor.getDouble(2);
+                    double lon = cursor.getDouble(3);
+
+                    Team t = new Team(teamID, teamName, new TeamLocation(lat, lon));
+                    followedTeamArrayList.add(t);
+                    // do what ever you want here
+                }
+            cursor.close();
         }
-        cursor.close();
+
+        System.out.println(followedTeamArrayList);
     }
-    //endregion
 
     //region Overridden Methods
 
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-
         // Grab the data item for this position, make sure that it is not null
         team = getItem(position);
         if(team == null)
@@ -99,6 +99,7 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
         followTeamBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+<<<<<<< HEAD
 
                 FirebaseMessaging.getInstance().subscribeToTopic("Chelsea");
 //                boolean isFav = false;
@@ -140,6 +141,49 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
 //                        dbHelper.insertTeam(t.getTeamId(), t.getTeamName(), t.getTeamLocation().getTeamLatitude(), t.getTeamLocation().getTeamLongitude());
 //                    }
 //                }
+=======
+                boolean isFav = false;
+                int index = -1;
+
+                //check if team is a favorite
+                if (followedTeamArrayList != null){
+                    isFav = doesContain(followedTeamArrayList, team);
+                    index = followedTeamArrayList.indexOf(team);
+                }
+
+                if (!isFav){  //team is not a favorite
+
+                    System.out.println("Team not a favorite but should be now");
+
+                    //make team a favorite
+                    followedTeamArrayList.add(team);
+
+                    followTeamBtn.setChecked(true);
+
+                } else { //team is a favorite
+
+                    System.out.println("Team a favorite but shouldn't be now");
+
+                    //un-favorite team
+                    if (index != -1) {
+                        dbHelper.deleteTeam(followedTeamArrayList.get(index).getTeamId());
+                        followedTeamArrayList.remove(index);
+                    }
+
+                    followTeamBtn.setChecked(false);
+
+
+
+                }
+
+                //save the array list
+                if (followedTeamArrayList != null){
+                    for (Team t: followedTeamArrayList){
+
+                        dbHelper.insertTeam(t.getTeamId(), t.getTeamName(), t.getTeamLocation().getTeamLatitude(), t.getTeamLocation().getTeamLongitude());
+                    }
+                }
+>>>>>>> 15dc7fb1cdb4e848bc3562579a1fe6ad9f244924
 
 
             }
@@ -159,7 +203,7 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
             isFav = doesContain(followedTeamArrayList, team);
         }
 
-        if (!isFav){  //airlines is not a favorite
+        if (!isFav){  //team is not a favorite
 
             //un-fill favorite image
             followTeamBtn.setChecked(false);

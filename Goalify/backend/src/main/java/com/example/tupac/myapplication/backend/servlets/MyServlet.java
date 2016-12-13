@@ -139,6 +139,7 @@ public class MyServlet extends HttpServlet {
 //            }
 //        });
 
+<<<<<<< HEAD
         DatabaseReference ref = database.getReference();
 
         Map<String, Match> matchesMap = new HashMap<String, Match>();
@@ -177,17 +178,57 @@ public class MyServlet extends HttpServlet {
                     queue.add(TaskOptions.Builder.withUrl("/notifications").param("teamName", String.valueOf(match.getAwayTeamName()))
                             .countdownMillis(delayTime));
 //                    queue.add(TaskOptions.Builder.withUrl("/notifications").param("team", String.valueOf(match.getHomeTeamName()))
+=======
+//        DatabaseReference ref = database.getReference();
+//
+//        Map<String, Match> matchesMap = new HashMap<String, Match>();
+//
+//        matchArrayList = new ArrayList<>();
+//        Match match = new Match(100, "Test1",200, "Test2", 17, 1481604300);
+//        matchArrayList.add(match);
+//        if (matchArrayList != null) {
+//            for (int i=0; i<matchArrayList.size(); i++){
+//                Match m = matchArrayList.get(i);
+//                matchesMap.put(m.getHomeTeamName() + " vs " + match.getAwayTeamName(), m);
+//            }
+//        }
+//
+//        ref.child("matches").setValue(matchesMap);
+//
+//        DatabaseReference matchesRef = database.getReference("matches");
+//
+//        matchesRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    //getting data from snapshot
+//                    Match match = snapshot.getValue(Match.class);
+//                    System.out.println("Matches -> " + match.getStartTime());
+//
+//                    long currentTime = System.currentTimeMillis();
+//                    //long fiveMins = 5 * 60; //in sec
+//
+//                    long delayTime = match.getStartTime() * 1000 - currentTime;
+//                    System.out.println("CurrentTime: " + currentTime + "MatchTime: " + match.getStartTime() +
+//                        "delayTime: " + delayTime);
+//
+//                    //Now create a new task with delayed execution
+//                    Queue queue = QueueFactory.getQueue("notification-queue");
+//                    queue.add(TaskOptions.Builder.withUrl("/notifications").param("teamName", String.valueOf(match.getAwayTeamName()))
+>>>>>>> 15dc7fb1cdb4e848bc3562579a1fe6ad9f244924
 //                            .countdownMillis(delayTime));
-                    System.out.println("Successfully created a Task in the Queue");
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+////                    queue.add(TaskOptions.Builder.withUrl("/notifications").param("team", String.valueOf(match.getHomeTeamName()))
+////                            .countdownMillis(delayTime));
+//                    System.out.println("Successfully created a Task in the Queue");
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 
 
@@ -265,17 +306,17 @@ public class MyServlet extends HttpServlet {
 //         * use the following commented code only once to populate info in the firebase database
 //         */
 //
-//        HttpHandler sh = new HttpHandler();
-//        // Making a request to url and getting response
-//        String mainUrl = "https://api.crowdscores.com/v1";
-//        String competitions = "/competitions";
-//        //competition_id for Premier League is 2
-//
-//        String rounds = "/rounds";
-//        String teams = "/teams?round_ids=&competition_ids=2";
-//        String matches = "/matches?team_id=7&round_ids=1044&competition_ids=2";
-//        String chelseaMatches = "/matches?team_id=7&round_ids=1044&competition_ids=2&from=2016-12-12T12:00:00-12:00&to=2016-12-20T12:00:00-12:00";
-//        String matchDetails = "/matches/69407";
+        HttpHandler sh = new HttpHandler();
+        // Making a request to url and getting response
+        String mainUrl = "https://api.crowdscores.com/v1";
+        String competitions = "/competitions";
+        //competition_id for Premier League is 2
+
+        String rounds = "/rounds";
+        String teams = "/teams?round_ids=&competition_ids=2";
+        String matches = "/matches?team_id=7&round_ids=1044&competition_ids=2";
+        String chelseaMatches = "/matches?team_id=7&round_ids=1044&competition_ids=2&from=2016-12-12T12:00:00-12:00&to=2016-12-20T12:00:00-12:00";
+        String matchDetails = "/matches/69407";
 
 //        String competitionsJsonStr = sh.makeServiceCall(mainUrl + competitions);
 //
@@ -321,20 +362,20 @@ public class MyServlet extends HttpServlet {
 //            }
 //        }
 
-//        String matchesJsonStr = sh.makeServiceCall(mainUrl + chelseaMatches);
-//
-//        if (matchesJsonStr != null) {
-//            try {
-//                //resp.getWriter().println(matchesJsonStr);
-//                // Getting JSON Array node
-//                JSONArray matchlist = new JSONArray(matchesJsonStr);
-//                //use service class to parse this json array and create a match model
-//                matchArrayList = ConvertJson.getMatchfromJson(matchlist);
-//
-//            } catch (final JSONException e) {
-//
-//            }
-//        }
+        String matchesJsonStr = sh.makeServiceCall(mainUrl + chelseaMatches);
+
+        if (matchesJsonStr != null) {
+            try {
+                //resp.getWriter().println(matchesJsonStr);
+                // Getting JSON Array node
+                JSONArray matchlist = new JSONArray(matchesJsonStr);
+                //use service class to parse this json array and create a match model
+                matchArrayList = ConvertJson.getMatchfromJson(matchlist);
+
+            } catch (final JSONException e) {
+
+            }
+        }
 
 //        String matchDetailsJsonStr = sh.makeServiceCall(mainUrl + matchDetails);
 //
@@ -405,19 +446,19 @@ public class MyServlet extends HttpServlet {
          /*
          * use this only once to populate matches
          */
-//        DatabaseReference matchesRef = ref.child("matches");
-//
-//        Map<String, Match> matchesMap = new HashMap<String, Match>();
-//
-//        if (matchArrayList != null) {
-//            for (int i=0; i<matchArrayList.size(); i++){
-//                Match match = matchArrayList.get(i);
-//                matchesMap.put(match.getHomeTeamName() + " vs " + match.getAwayTeamName(), new Match(match.getAwayGoals(), match.getAwayTeamName(),
-//                        match.getHomeGoals(), match.getHomeTeamName(), match.getMatchId(), match.getStartTime()));
-//            }
-//        }
-//
-//        matchesRef.setValue(matchesMap);
+        DatabaseReference matchesRef = database.getReference().child("matches");
+
+        Map<String, Match> matchesMap = new HashMap<String, Match>();
+
+        if (matchArrayList != null) {
+            for (int i=0; i<matchArrayList.size(); i++){
+                Match match = matchArrayList.get(i);
+                matchesMap.put(match.getHomeTeamName() + " vs " + match.getAwayTeamName(), new Match(match.getAwayGoals(), match.getAwayTeamName(),
+                        match.getHomeGoals(), match.getHomeTeamName(), match.getMatchId(), match.getStartTime()));
+            }
+        }
+
+        matchesRef.setValue(matchesMap);
 //
 //
 
