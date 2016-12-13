@@ -10,6 +10,11 @@ public class TeamLocation {
 
     public TeamLocation(){}
 
+    public TeamLocation(double lat, double lon) {
+        this.teamLatitude = lat;
+        this.teamLongitude = lon;
+    }
+
     public double getTeamLatitude() {
         return teamLatitude;
     }

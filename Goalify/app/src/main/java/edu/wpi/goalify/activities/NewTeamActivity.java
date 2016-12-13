@@ -21,12 +21,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import android.widget.Button;
-import android.widget.Toast;
-
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import edu.wpi.goalify.R;
 import edu.wpi.goalify.adapters.LeaguesAdapter;
@@ -38,7 +32,7 @@ import edu.wpi.goalify.models.TrackGPS;
 
 public class NewTeamActivity extends AppCompatActivity {
     //region Constants
-    public static final String TEAM_ID = "team_id";
+    public static final String LEAGUE_ID = "league_id";
     //endregion
 
     //region Private View Instances
@@ -156,6 +150,7 @@ public class NewTeamActivity extends AppCompatActivity {
         mLeaguesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
                 Intent teamIntent = new Intent(NewTeamActivity.this, TeamsActivity.class);
+                teamIntent.putExtra(LEAGUE_ID, 0L);
                 startActivity(teamIntent);
             }
         });
@@ -168,8 +163,9 @@ public class NewTeamActivity extends AppCompatActivity {
         mTeamsSearchResultListView.setAdapter(mTeamsAdapter);
         mTeamsSearchResultListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-                Intent teamIntent = new Intent(NewTeamActivity.this, TeamsActivity.class);
-                startActivity(teamIntent);
+                Team team = (Team)parent.getItemAtPosition(position);
+                String name = team.getTeamName();
+                goToTeamDetailActivity(name);
             }
         });
     }
@@ -186,9 +182,9 @@ public class NewTeamActivity extends AppCompatActivity {
         setTitle(R.string.add_new_team);
     }
 
-    private void goToTeamDetailActivity(long teamKey){
+    private void goToTeamDetailActivity(String teamName){
         Intent teamDetailIntent = new Intent(this, TeamDetailActivity.class);
-//        teamDetailIntent.putExtra(TEAM_ID, teamKey);
+        teamDetailIntent.putExtra(MainActivity.TEAM_NAME, teamName);
         startActivity(teamDetailIntent);
     }
 
@@ -214,10 +210,6 @@ public class NewTeamActivity extends AppCompatActivity {
         League epl = new League("EPL");
         mLeaguesAdapter.add(epl);
         mLeaguesAdapter.notifyDataSetChanged();
-    }
-
-    private void getTeamsForLeague(long leagueId){
-
     }
 
     /**

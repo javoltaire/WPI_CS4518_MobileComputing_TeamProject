@@ -10,6 +10,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class FirebaseUtil {
     //region Constants
     public static final String TEAMS = "teams";
+    public static final String MATCHES = "matches";
     //endregion
 
     //region Private Variables
@@ -23,6 +24,10 @@ public class FirebaseUtil {
 
     public static DatabaseReference getTeamsReference(){
         return sDatabaseReference.child(TEAMS);
+    }
+
+    public static DatabaseReference getMatchesReference(){
+        return sDatabaseReference.child(MATCHES);
     }
     //endregion
 }
