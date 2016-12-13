@@ -40,6 +40,29 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
      */
     public TeamsAdapter(Context context, ArrayList<Team> teams){
         super(context, R.layout.item_team, teams);
+        init();
+    }
+
+    private void init() {
+        dbHelper = new DBHelper(getContext());
+        followedTeamArrayList = new ArrayList<>();
+
+        Cursor cursor = dbHelper.getAllTeams();
+
+        if (cursor.moveToFirst()){
+            while(cursor.moveToNext()){
+                int teamID = cursor.getInt(0);
+                String teamName = cursor.getString(1);
+                double lat = cursor.getDouble(2);
+                double lon = cursor.getDouble(3);
+
+                Team t = new Team(teamID, teamName, new TeamLocation(lat, lon));
+                followedTeamArrayList.add(t);
+                System.out.println(followedTeamArrayList);
+                // do what ever you want here
+            }
+        }
+        cursor.close();
     }
     //endregion
 
@@ -49,24 +72,6 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        dbHelper = new DBHelper(getContext());
-        followedTeamArrayList = new ArrayList<>();
-
-        Cursor cursor = dbHelper.getAllTeams();
-
-        if (cursor.moveToFirst()){
-            do{
-                int teamID = cursor.getInt(cursor.getColumnIndex("id"));
-                String teamName = cursor.getString(cursor.getColumnIndex("team_name"));
-                double lat = cursor.getDouble(cursor.getColumnIndex("team_location_lat"));
-                double lon = cursor.getDouble(cursor.getColumnIndex("team_location_lon"));
-
-                Team t = new Team(teamID, teamName, new TeamLocation(lat, lon));
-                followedTeamArrayList.add(t);
-                // do what ever you want here
-            }while(cursor.moveToNext());
-        }
-        cursor.close();
 
         // Grab the data item for this position, make sure that it is not null
         team = getItem(position);
@@ -97,11 +102,13 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
 
                 //check if team is a favorite
                 if (followedTeamArrayList != null){
-                    isFav = followedTeamArrayList.contains(team);
+                    isFav = doesContain(followedTeamArrayList, team);
                     index = followedTeamArrayList.indexOf(team);
                 }
 
                 if (!isFav){  //team is not a favorite
+
+                    System.out.println("Team not a favorite but should be now");
 
                     //make team a favorite
                     followedTeamArrayList.add(team);
@@ -110,8 +117,11 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
 
                 } else { //team is a favorite
 
+                    System.out.println("Team a favorite but shouldn't be now");
+
                     //un-favorite team
                     if (index != -1) {
+                        dbHelper.deleteTeam(followedTeamArrayList.get(index).getTeamId());
                         followedTeamArrayList.remove(index);
                     }
 
@@ -142,7 +152,7 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
 
         //check if the team is a favorite
         if (followedTeamArrayList != null){
-            isFav = followedTeamArrayList.contains(team);
+            isFav = doesContain(followedTeamArrayList, team);
         }
 
         if (!isFav){  //airlines is not a favorite
@@ -155,6 +165,15 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
             followTeamBtn.setChecked(true);
 
         }
+    }
+
+    private boolean doesContain(ArrayList<Team> followedTeamArrayList, Team team) {
+        for (Team t: followedTeamArrayList){
+            if (t.getTeamName().equals(team.getTeamName())){
+                return true;
+            }
+        }
+        return false;
     }
     //endregion
 }
