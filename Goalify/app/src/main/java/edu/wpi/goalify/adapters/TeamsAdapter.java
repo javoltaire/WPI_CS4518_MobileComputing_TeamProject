@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import java.util.ArrayList;
 
 import edu.wpi.goalify.R;
@@ -97,45 +99,47 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
         followTeamBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean isFav = false;
-                int index = -1;
 
-                //check if team is a favorite
-                if (followedTeamArrayList != null){
-                    isFav = doesContain(followedTeamArrayList, team);
-                    index = followedTeamArrayList.indexOf(team);
-                }
-
-                if (!isFav){  //team is not a favorite
-
-                    System.out.println("Team not a favorite but should be now");
-
-                    //make team a favorite
-                    followedTeamArrayList.add(team);
-
-                    followTeamBtn.setChecked(true);
-
-                } else { //team is a favorite
-
-                    System.out.println("Team a favorite but shouldn't be now");
-
-                    //un-favorite team
-                    if (index != -1) {
-                        dbHelper.deleteTeam(followedTeamArrayList.get(index).getTeamId());
-                        followedTeamArrayList.remove(index);
-                    }
-
-                    followTeamBtn.setChecked(false);
-
-
-                }
-
-                //save the array list
-                if (followedTeamArrayList != null){
-                    for (Team t: followedTeamArrayList){
-                        dbHelper.insertTeam(t.getTeamId(), t.getTeamName(), t.getTeamLocation().getTeamLatitude(), t.getTeamLocation().getTeamLongitude());
-                    }
-                }
+                FirebaseMessaging.getInstance().subscribeToTopic("Chelsea");
+//                boolean isFav = false;
+//                int index = -1;
+//
+//                //check if team is a favorite
+//                if (followedTeamArrayList != null){
+//                    isFav = doesContain(followedTeamArrayList, team);
+//                    index = followedTeamArrayList.indexOf(team);
+//                }
+//
+//                if (!isFav){  //team is not a favorite
+//
+//                    System.out.println("Team not a favorite but should be now");
+//
+//                    //make team a favorite
+//                    followedTeamArrayList.add(team);
+//
+//                    followTeamBtn.setChecked(true);
+//
+//                } else { //team is a favorite
+//
+//                    System.out.println("Team a favorite but shouldn't be now");
+//
+//                    //un-favorite team
+//                    if (index != -1) {
+//                        dbHelper.deleteTeam(followedTeamArrayList.get(index).getTeamId());
+//                        followedTeamArrayList.remove(index);
+//                    }
+//
+//                    followTeamBtn.setChecked(false);
+//
+//
+//                }
+//
+//                //save the array list
+//                if (followedTeamArrayList != null){
+//                    for (Team t: followedTeamArrayList){
+//                        dbHelper.insertTeam(t.getTeamId(), t.getTeamName(), t.getTeamLocation().getTeamLatitude(), t.getTeamLocation().getTeamLongitude());
+//                    }
+//                }
 
 
             }
