@@ -51,7 +51,6 @@ public class TeamDetailActivity extends AppCompatActivity {
         // Grab data
         String teamName= getIntent().getStringExtra(MainActivity.TEAM_NAME);
         if(teamName == null){
-            showNoResult(true);
             setTitle("No Result");
         }
         else{
@@ -93,14 +92,14 @@ public class TeamDetailActivity extends AppCompatActivity {
         setTitle("Teams");
     }
 
-    private void showNoResult(boolean b){
+    private void showResult(boolean b){
         if(b){
-            mNoResultTextView.setVisibility(View.VISIBLE);
-            mMatchesListView.setVisibility(View.GONE);
-        }
-        else{
             mNoResultTextView.setVisibility(View.GONE);
             mMatchesListView.setVisibility(View.VISIBLE);
+        }
+        else{
+            mNoResultTextView.setVisibility(View.VISIBLE);
+            mMatchesListView.setVisibility(View.GONE);
         }
     }
 
@@ -114,9 +113,9 @@ public class TeamDetailActivity extends AppCompatActivity {
                     mMatchesAdapter.add(match);
                     mMatchesAdapter.notifyDataSetChanged();
                     if(mMatchesAdapter.getCount() <= 0)
-                        showNoResult(true);
+                        showResult(false);
                     else
-                        showNoResult(false);
+                        showResult(true);
                 }
             }
 
