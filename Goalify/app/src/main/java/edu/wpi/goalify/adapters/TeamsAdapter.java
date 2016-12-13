@@ -67,15 +67,12 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
 
         System.out.println(followedTeamArrayList);
     }
-    //endregion
 
     //region Overridden Methods
 
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-
         // Grab the data item for this position, make sure that it is not null
         team = getItem(position);
         if(team == null)
@@ -105,11 +102,13 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
 
                 //check if team is a favorite
                 if (followedTeamArrayList != null){
-                    isFav = followedTeamArrayList.contains(team);
+                    isFav = doesContain(followedTeamArrayList, team);
                     index = followedTeamArrayList.indexOf(team);
                 }
 
                 if (!isFav){  //team is not a favorite
+
+                    System.out.println("Team not a favorite but should be now");
 
                     //make team a favorite
                     followedTeamArrayList.add(team);
@@ -117,6 +116,8 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
                     followTeamBtn.setChecked(true);
 
                 } else { //team is a favorite
+
+                    System.out.println("Team a favorite but shouldn't be now");
 
                     //un-favorite team
                     if (index != -1) {
@@ -169,15 +170,12 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
     }
 
     private boolean doesContain(ArrayList<Team> followedTeamArrayList, Team team) {
-        boolean result = false;
-
         for (Team t: followedTeamArrayList){
             if (t.getTeamName().equals(team.getTeamName())){
                 return true;
             }
         }
-
-        return result;
+        return false;
     }
     //endregion
 }

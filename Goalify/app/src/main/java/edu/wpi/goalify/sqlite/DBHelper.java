@@ -15,7 +15,7 @@ import edu.wpi.goalify.models.TeamLocation;
 public class DBHelper  extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "SQLiteData.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     public static final String TABLE_NAME = "followed_teams";
     public static final String TEAM_ID = "_id";
     public static final String TEAM_NAME = "team_name";
@@ -51,7 +51,6 @@ public class DBHelper  extends SQLiteOpenHelper {
         contentValues.put(TEAM_NAME, name);
         contentValues.put(TEAM_LOCATION_LAT, lat);
         contentValues.put(TEAM_LOCATION_LON, lat);
-        // this will insert if record is new, update otherwise
         db.insertWithOnConflict(TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
         return true;
     }
