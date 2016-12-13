@@ -6,14 +6,14 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/item_teamFlag_imageView"
+        android:id="@+id/item_leagueFlag_imageView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         app:srcCompat="@android:drawable/sym_def_app_icon"
         android:layout_alignParentLeft="true" />
 
     <TextView
-        android:id="@+id/item_teamName_textVIew"
+        android:id="@+id/item_leagueName_textVIew"
         android:text="TextView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -21,11 +21,4 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <ToggleButton
-        android:id="@+id/item_followTeam_toggleButton"
-        android:text="ToggleButton"
-        android:focusable="false"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"/>
 </RelativeLayout>

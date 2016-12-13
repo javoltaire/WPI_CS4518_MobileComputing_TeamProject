@@ -1,4 +1,4 @@
-package edu.wpi.goalify.simplemodels;
+package edu.wpi.goalify.models;
 
 /**
  * Created by tupac and Jules Voltaire on 12/4/2016.

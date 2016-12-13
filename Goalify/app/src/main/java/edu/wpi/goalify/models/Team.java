@@ -1,133 +1,45 @@
 package edu.wpi.goalify.models;
 
+
 /**
- * @author Jules Voltaire on 12/5/2016. (Generated)
+ * Created by tupac and Jules Voltaire on 12/3/2016.
  */
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
-import edu.wpi.goalify.models.helpers.Geolocation;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder({
-        "name",
-        "dbid",
-        "geolocation",
-        "isNational",
-        "shortName"
-})
 public class Team {
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("dbid")
-    private int dbid;
-    @JsonProperty("geolocation")
-    private Geolocation geolocation;
-    @JsonProperty("isNational")
-    private boolean isNational;
-    @JsonProperty("shortName")
-    private String shortName;
+    int teamId;
+    String teamName;
+    TeamLocation teamLocation;
 
-    /**
-     *
-     * @return
-     * The name
-     */
-    @JsonProperty("name")
-    public String getName() {
-        return name;
+    public Team() {
     }
 
-    /**
-     *
-     * @param name
-     * The name
-     */
-    @JsonProperty("name")
-    public void setName(String name) {
-        this.name = name;
+    public Team(int teamId, String teamName, TeamLocation teamLocation) {
+        this.teamId = teamId;
+        this.teamName = teamName;
+        this.teamLocation = teamLocation;
     }
 
-    /**
-     *
-     * @return
-     * The dbid
-     */
-    @JsonProperty("dbid")
-    public int getDbid() {
-        return dbid;
+    public int getTeamId() {
+        return teamId;
     }
 
-    /**
-     *
-     * @param dbid
-     * The dbid
-     */
-    @JsonProperty("dbid")
-    public void setDbid(int dbid) {
-        this.dbid = dbid;
+    public void setTeamId(int teamId) {
+        this.teamId = teamId;
     }
 
-    /**
-     *
-     * @return
-     * The geolocation
-     */
-    @JsonProperty("geolocation")
-    public Geolocation getGeolocation() {
-        return geolocation;
+    public TeamLocation getTeamLocation() {
+        return teamLocation;
     }
 
-    /**
-     *
-     * @param geolocation
-     * The geolocation
-     */
-    @JsonProperty("geolocation")
-    public void setGeolocation(Geolocation geolocation) {
-        this.geolocation = geolocation;
+    public void setTeamLocation(TeamLocation teamLocation) {
+        this.teamLocation = teamLocation;
     }
 
-    /**
-     *
-     * @return
-     * The isNational
-     */
-    @JsonProperty("isNational")
-    public boolean isIsNational() {
-        return isNational;
+    public String getTeamName() {
+        return teamName;
     }
 
-    /**
-     *
-     * @param isNational
-     * The isNational
-     */
-    @JsonProperty("isNational")
-    public void setIsNational(boolean isNational) {
-        this.isNational = isNational;
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
     }
-
-    /**
-     *
-     * @return
-     * The shortName
-     */
-    @JsonProperty("shortName")
-    public String getShortName() {
-        return shortName;
-    }
-
-    /**
-     *
-     * @param shortName
-     * The shortName
-     */
-    @JsonProperty("shortName")
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-    }
-
 }

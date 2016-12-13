@@ -1,4 +1,4 @@
-package edu.wpi.goalify.models.helpers;
+package edu.wpi.goalify.complexmodels.helpers;
 
 /**
  * @author Jules Voltaire on 12/5/2016 (Generated)
