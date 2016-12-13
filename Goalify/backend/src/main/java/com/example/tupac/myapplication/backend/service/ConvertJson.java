@@ -238,16 +238,16 @@ public class ConvertJson {
         // Deserialize json into object fields
         try {
             match.setMatchId(matchJSON.getInt("dbid"));
-            match.setCompetition(getCompetitionfromJson(matchJSON.getJSONObject("competition")));
-            match.setHomeTeam(getTeamfromJson(matchJSON.getJSONObject("homeTeam")));
-            match.setAwayTeam(getTeamfromJson(matchJSON.getJSONObject("awayTeam")));
+            match.setHomeTeamName(getTeamfromJson(matchJSON.getJSONObject("homeTeam")).getTeamName());
+            match.setAwayTeamName(getTeamfromJson(matchJSON.getJSONObject("awayTeam")).getTeamName());
             match.setHomeGoals(matchJSON.getInt("homeGoals"));
             match.setAwayGoals(matchJSON.getInt("awayGoals"));
+            match.setStartTime(matchJSON.getLong("start"));
 
-            Double start = matchJSON.getDouble("start");
-            String startStr = new BigDecimal(start).toPlainString();
-            Date startDate = new Date(Long.parseLong(startStr));
-            match.setStartTime(startDate);
+//            Double start = matchJSON.getDouble("start");
+//            String startStr = new BigDecimal(start).toPlainString();
+//            Date startDate = new Date(Long.parseLong(startStr));
+//            match.setStartTime(startDate);
 
         } catch (JSONException e) {
             return match;

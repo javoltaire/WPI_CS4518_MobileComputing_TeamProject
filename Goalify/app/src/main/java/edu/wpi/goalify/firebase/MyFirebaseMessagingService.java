@@ -13,6 +13,7 @@ import android.util.Log;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import edu.wpi.goalify.R;
 import edu.wpi.goalify.activities.MainActivity;
 
 /**
