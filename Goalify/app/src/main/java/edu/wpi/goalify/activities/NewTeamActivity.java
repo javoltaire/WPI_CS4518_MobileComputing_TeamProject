@@ -28,6 +28,7 @@ import edu.wpi.goalify.adapters.TeamsAdapter;
 import edu.wpi.goalify.dataservice.FirebaseUtil;
 import edu.wpi.goalify.models.League;
 import edu.wpi.goalify.models.Team;
+import edu.wpi.goalify.models.TrackGPS;
 
 public class NewTeamActivity extends AppCompatActivity {
     //region Constants
@@ -41,6 +42,7 @@ public class NewTeamActivity extends AppCompatActivity {
 
     private LinearLayout mLocalsAndLeaguesLinearLayout;
     private ListView mLeaguesListView;
+    private ListView mLocalTeamsListView;
 
     private LinearLayout mTeamsSearchResultLinearLayout;
     private TextView mTeamsSearchResultTitleTextView;
@@ -48,8 +50,14 @@ public class NewTeamActivity extends AppCompatActivity {
     //endregion
 
     //region Private variables
+    private TeamsAdapter mLocalTeamsAdapter;
     private TeamsAdapter mTeamsAdapter;
     private LeaguesAdapter mLeaguesAdapter;
+    private ArrayList<Team> mAllTeamsList = new ArrayList<Team>();
+
+    private TrackGPS gps;
+    private double longitude;
+    private double latitude;
     //endregion
 
     //region Activity Overridden Methods
@@ -57,9 +65,21 @@ public class NewTeamActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_team);
+
+        gps = new TrackGPS(NewTeamActivity.this);
+        //current user location
+//        if(gps.canGetLocation()) {
+//            longitude = gps.getLongitude();
+//            latitude = gps.getLatitude();
+//        }
+        //chelsea location
+        latitude = 51.4851;
+        longitude = -0.1749;
+
         setupActionBar();
         initControls();
         getLeagues();
+        findLocalTeams();
 
     }
 
@@ -112,6 +132,17 @@ public class NewTeamActivity extends AppCompatActivity {
         mClearSearchButton = (Button) findViewById(R.id.btn_clearSearch);
 
         mLocalsAndLeaguesLinearLayout = (LinearLayout) findViewById(R.id.linearLayout_locals_and_leagues);
+        // Setting up the local teams list view
+        mLocalTeamsListView = (ListView) findViewById(R.id.ListView_Local_Teams);
+        mLocalTeamsAdapter = new TeamsAdapter(this, new ArrayList<Team>());
+        mLocalTeamsListView.setAdapter(mLocalTeamsAdapter);
+        mLocalTeamsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+                Intent teamIntent = new Intent(NewTeamActivity.this, TeamsActivity.class);
+                startActivity(teamIntent);
+            }
+        });
+
         // Setting up the leagues list view
         mLeaguesListView = (ListView) findViewById(R.id.ListView_Leagues);
         mLeaguesAdapter = new LeaguesAdapter(this, new ArrayList<League>());
@@ -208,6 +239,75 @@ public class NewTeamActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Submits a request to firebase to get a list of all teams
+     *
+     */
+    private void findLocalTeams(){
+        mAllTeamsList.clear();
+        Query queryReference = FirebaseUtil.getTeamsReference().orderByKey();
+        queryReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> snapShots = dataSnapshot.getChildren();
+                for(DataSnapshot snapshot : snapShots) {
+                    Team team = snapshot.getValue(Team.class);
+                    mAllTeamsList.add(team);
+
+                }
+                getLocalTeams();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        //mTeamsSearchResultTitleTextView.setText(getString(R.string.text_search_result_for) + ": " + teamName);
+
+    }
+
+
+    private void getLocalTeams(){
+
+        int count = 0;
+        int distance = 100;
+        mLocalTeamsAdapter.clear();
+
+        for(int i=0 ; i<mAllTeamsList.size() ; i++){
+            Team team = mAllTeamsList.get(i);
+            if(calculateDistanceInKilometer(team.getTeamLocation().getTeamLatitude(),team.getTeamLocation().getTeamLongitude(),
+                                            latitude,longitude) < distance && count < 4) {
+                mLocalTeamsAdapter.add(team);
+                count++;
+            }
+        }
+        mLocalTeamsAdapter.notifyDataSetChanged();
+
+    }
+
+    /**
+     * Calculate distance between two lat/long points
+     * @param userLat
+     * @param userLng
+     * @param venueLat
+     * @param venueLng
+     * @return distance in kilometers
+     */
+    public int calculateDistanceInKilometer(double userLat, double userLng,
+                                            double venueLat, double venueLng) {
+        double AVERAGE_RADIUS_OF_EARTH_KM = 6371;
+        double latDistance = Math.toRadians(userLat - venueLat);
+        double lngDistance = Math.toRadians(userLng - venueLng);
+
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(userLat)) * Math.cos(Math.toRadians(venueLat))
+                * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return (int) (Math.round(AVERAGE_RADIUS_OF_EARTH_KM * c));
+    }
     //endregion
     //endregion
 }
