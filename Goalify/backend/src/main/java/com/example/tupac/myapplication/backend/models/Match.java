@@ -9,27 +9,15 @@ import java.util.Date;
 public class Match {
 
     int matchId;
-    Competition competition;
-    Team homeTeam;
-    Team awayTeam;
+    String homeTeamName;
+    String awayTeamName;
     int homeGoals;
     int awayGoals;
-    Date startTime;
+    long startTime;
 
-    public Match(int awayGoals, Team awayTeam, Competition competition, int homeGoals, Team homeTeam, int matchId, Date startTime) {
-        this.awayGoals = awayGoals;
-        this.awayTeam = awayTeam;
-        this.competition = competition;
-        this.homeGoals = homeGoals;
-        this.homeTeam = homeTeam;
-        this.matchId = matchId;
-        this.startTime = startTime;
-    }
 
-    public Match() {
 
-        this.matchId = 0;
-    }
+    public Match() {   }
 
     public int getAwayGoals() {
         return awayGoals;
@@ -39,20 +27,12 @@ public class Match {
         this.awayGoals = awayGoals;
     }
 
-    public Team getAwayTeam() {
-        return awayTeam;
+    public String getAwayTeamName() {
+        return awayTeamName;
     }
 
-    public void setAwayTeam(Team awayTeam) {
-        this.awayTeam = awayTeam;
-    }
-
-    public Competition getCompetition() {
-        return competition;
-    }
-
-    public void setCompetition(Competition competition) {
-        this.competition = competition;
+    public void setAwayTeamName(String awayTeamName) {
+        this.awayTeamName = awayTeamName;
     }
 
     public int getHomeGoals() {
@@ -63,12 +43,12 @@ public class Match {
         this.homeGoals = homeGoals;
     }
 
-    public Team getHomeTeam() {
-        return homeTeam;
+    public String getHomeTeamName() {
+        return homeTeamName;
     }
 
-    public void setHomeTeam(Team homeTeam) {
-        this.homeTeam = homeTeam;
+    public void setHomeTeamName(String homeTeamName) {
+        this.homeTeamName = homeTeamName;
     }
 
     public int getMatchId() {
@@ -79,11 +59,21 @@ public class Match {
         this.matchId = matchId;
     }
 
-    public Date getStartTime() {
+    public long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(long startTime) {
         this.startTime = startTime;
     }
+
+    public Match(int awayGoals, String awayTeamName, int homeGoals, String homeTeamName, int matchId, long startTime) {
+        this.matchId = matchId;
+        this.homeTeamName = homeTeamName;
+        this.awayTeamName = awayTeamName;
+        this.homeGoals = homeGoals;
+        this.awayGoals = awayGoals;
+        this.startTime = startTime;
+    }
+
 }

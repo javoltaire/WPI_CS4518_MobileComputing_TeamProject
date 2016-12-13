@@ -21,6 +21,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import android.widget.Button;
+
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import edu.wpi.goalify.R;
 import edu.wpi.goalify.adapters.LeaguesAdapter;
@@ -59,8 +62,8 @@ public class NewTeamActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_team);
         setupActionBar();
         initControls();
-
         getLeagues();
+
     }
 
     @Override
