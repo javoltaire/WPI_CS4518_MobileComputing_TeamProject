@@ -28,8 +28,8 @@ public class MatchesAdapter extends ArrayAdapter<Match> {
     public View getView(int position, View convertView, ViewGroup parent) {
         // Grab the data item for this position, make sure that it is not null
         Match match = getItem(position);
-        if(match == null)
-            return super.getView(position, convertView, parent);
+//        if(match == null)
+//            return super.getView(position, convertView, parent);
 
         // Check if an existing view is being reused, otherwise inflate the view
         if(convertView == null){

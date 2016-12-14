@@ -144,7 +144,8 @@ public class MyServlet extends HttpServlet {
         Map<String, Match> matchesMap = new HashMap<String, Match>();
 
         matchArrayList = new ArrayList<>();
-        Match match = new Match(100, "Test1",200, "Test2", 17, 1481628073);
+        long addTime = 11; //sec
+        Match match = new Match(100, "Test1",200, "Test2", 17, System.currentTimeMillis()/1000 + addTime);
         matchArrayList.add(match);
         if (matchArrayList != null) {
             for (int i=0; i<matchArrayList.size(); i++){
@@ -305,7 +306,7 @@ public class MyServlet extends HttpServlet {
 //            }
 //        }
 
-
+//
 //        String teamsJsonStr = sh.makeServiceCall(mainUrl + teams);
 //
 //        if (teamsJsonStr != null) {
@@ -389,7 +390,7 @@ public class MyServlet extends HttpServlet {
 //            }
 //        }
 
-//        DatabaseReference teamRef = ref.child("teams");
+//        DatabaseReference teamRef = database.getReference().child("teams");
 //
 //        Map<String, Team> teamsMap = new HashMap<String, Team>();
 //
