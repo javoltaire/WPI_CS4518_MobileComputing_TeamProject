@@ -102,6 +102,10 @@ public class TeamsActivity extends AppCompatActivity {
         setTitle(R.string.my_teams);
     }
 
+    /**
+     * Using an intent this navigate to the teamDetail activity
+     * @param teamName
+     */
     private void goToTeamDetailActivity(String teamName){
         Intent teamDetailIntent = new Intent(this, TeamDetailActivity.class);
         teamDetailIntent.putExtra(MainActivity.TEAM_NAME, teamName);
@@ -110,6 +114,11 @@ public class TeamsActivity extends AppCompatActivity {
     //endregion
 
     //region DataMethods
+
+    /**
+     * Gets a list of teams that are part of a league
+     * @param leageId
+     */
     private void getTeamsForLeague(long leageId){
         Query query = FirebaseUtil.getTeamsReference().orderByKey();
         leageTeamsListener = query.addChildEventListener(new ChildEventListener() {

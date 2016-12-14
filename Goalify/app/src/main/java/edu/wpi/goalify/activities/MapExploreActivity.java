@@ -60,6 +60,9 @@ public class MapExploreActivity extends AppCompatActivity implements OnMapReadyC
         }
     }
 
+    /**
+     * Initializes the map fragment
+     */
     private void initMap() {
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);

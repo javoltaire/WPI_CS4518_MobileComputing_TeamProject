@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        // Navigate to the right activity based on the item clicked
         switch(id){
             case R.id.nav_my_teams : goToActivity(TeamsActivity.class); break;
             case R.id.nav_explore : goToActivity(MapExploreActivity.class); break;
@@ -66,13 +67,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             default: return super.onOptionsItemSelected(item);
         }
 
+        // Close the drawer when done.
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     //region Private Methods
-
     /**
      * Creates an intent and starts an activity with that intent
      * @param c The activity class to use for the intent.

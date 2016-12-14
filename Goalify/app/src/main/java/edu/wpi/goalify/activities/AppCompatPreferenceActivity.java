@@ -18,8 +18,11 @@ import android.view.ViewGroup;
  */
 public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
 
+    //region Private variables
     private AppCompatDelegate mDelegate;
+    //endregion
 
+    //region Overridden Activity Methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getDelegate().installViewFactory();
@@ -95,6 +98,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
         super.onDestroy();
         getDelegate().onDestroy();
     }
+    //endregion
 
     public void invalidateOptionsMenu() {
         getDelegate().invalidateOptionsMenu();

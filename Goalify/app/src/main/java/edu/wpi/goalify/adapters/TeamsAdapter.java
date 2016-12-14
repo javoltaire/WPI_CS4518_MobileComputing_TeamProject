@@ -3,6 +3,7 @@ package edu.wpi.goalify.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,8 +27,6 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
     //list of followed teams
     private static ArrayList<Team> followedTeamArrayList;
 
-    private Team team;
-
     private ToggleButton followTeamBtn;
 
     private DBHelper dbHelper;
@@ -36,36 +35,54 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
     /**
      * Initializes a new instance of this class
      * @param context
-     * @param teams
      */
     public TeamsAdapter(Context context, ArrayList<Team> teams){
         super(context, R.layout.item_team, teams);
         init();
     }
 
+
+
     private void init() {
         dbHelper = new DBHelper(getContext());
         followedTeamArrayList = new ArrayList<>();
 
-        Cursor cursor = dbHelper.getAllTeams();
+        deleteList();
 
+//        Cursor cursor = dbHelper.getAllTeams();
+//
+//        cursor.moveToFirst();
+//
+//        while (!cursor.isAfterLast()){
+//
+//            int teamID = cursor.getInt(0);
+//            String teamName = cursor.getString(1);
+//            double lat = cursor.getDouble(2);
+//            double lon = cursor.getDouble(3);
+//
+//            Team t = new Team(teamID, teamName, new TeamLocation(lat, lon));
+//            followedTeamArrayList.add(t);
+//            cursor.moveToNext();
+//        }
+//        cursor.close();
 
+        printList();
+    }
 
-        if (cursor != null){
-                while (cursor.moveToNext()){
-                    int teamID = cursor.getInt(0);
-                    String teamName = cursor.getString(1);
-                    double lat = cursor.getDouble(2);
-                    double lon = cursor.getDouble(3);
-
-                    Team t = new Team(teamID, teamName, new TeamLocation(lat, lon));
-                    followedTeamArrayList.add(t);
-                    // do what ever you want here
-                }
-            cursor.close();
+    private void deleteList() {
+        if (followedTeamArrayList != null ){
+            for (Team team: followedTeamArrayList){
+                dbHelper.deleteTeam(team.getTeamId());
+            }
         }
+    }
 
-        System.out.println(followedTeamArrayList);
+    private void printList() {
+        if (followedTeamArrayList != null ){
+            for (Team team: followedTeamArrayList){
+                System.out.println("-------------------->>>>>>>>>>>>>>" + team.getTeamName());
+            }
+        }
     }
 
     //region Overridden Methods
@@ -74,7 +91,9 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Grab the data item for this position, make sure that it is not null
-        team = getItem(position);
+        final Team team = getItem(position);
+        //System.out.println(team.getTeamName());
+
         if(team == null)
             return super.getView(position, convertView, parent);
 
@@ -92,69 +111,69 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
         //toggle button
         followTeamBtn = (ToggleButton) convertView.findViewById(R.id.item_followTeam_toggleButton);
 
-        setupFollowButton();
+        //setupFollowButton(team);
 
-        followTeamBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                boolean isFav = false;
-                int index = -1;
-
-                //check if team is a favorite
-                if (followedTeamArrayList != null){
-                    isFav = doesContain(followedTeamArrayList, team);
-                    index = followedTeamArrayList.indexOf(team);
-                }
-
-                if (!isFav){  //team is not a favorite
-
-                    System.out.println("Team not a favorite but should be now");
-
-                    //make team a favorite
-                    followedTeamArrayList.add(team);
-
-                    followTeamBtn.setChecked(true);
-
-                } else { //team is a favorite
-
-                    System.out.println("Team a favorite but shouldn't be now");
-
-                    //un-favorite team
-                    if (index != -1) {
-                        dbHelper.deleteTeam(followedTeamArrayList.get(index).getTeamId());
-                        followedTeamArrayList.remove(index);
-                    }
-
-                    followTeamBtn.setChecked(false);
-
-
-
-                }
-
-                //save the array list
-                if (followedTeamArrayList != null){
-                    for (Team t: followedTeamArrayList){
-
-                        dbHelper.insertTeam(t.getTeamId(), t.getTeamName(), t.getTeamLocation().getTeamLatitude(), t.getTeamLocation().getTeamLongitude());
-                    }
-                }
-
-
-            }
-        });
+//        followTeamBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                boolean isFav = false;
+//                int index = -1;
+//
+//                //System.out.println(team.getTeamName());
+//                //check if team is a favorite
+//                if (followedTeamArrayList != null){
+//                    isFav = doesContain(followedTeamArrayList, team);
+//                    index = followedTeamArrayList.indexOf(team);
+//                }
+//
+//                if (!isFav){  //team is not a favorite
+//
+//                    System.out.println("Team not a favorite but should be now");
+//
+//                    //make team a favorite
+//                    followedTeamArrayList.add(team);
+//                    followTeamBtn.setChecked(true);
+//
+//                } else { //team is a favorite
+//
+//                    System.out.println("Team a favorite but shouldn't be now");
+//
+//                    //un-favorite team
+//                    if (index != -1) {
+//                        dbHelper.deleteTeam(followedTeamArrayList.get(index).getTeamId());
+//                        followedTeamArrayList.remove(index);
+//                    }
+//
+//                    followTeamBtn.setChecked(false);
+//
+//
+//
+//                }
+//
+//                //save the array list
+//                if (followedTeamArrayList != null){
+//                    for (Team t: followedTeamArrayList){
+//
+//                        dbHelper.insertTeam(t.getTeamId(), t.getTeamName(), t.getTeamLocation().getTeamLatitude(), t.getTeamLocation().getTeamLongitude());
+//                    }
+//                }
+//
+//
+//            }
+//        });
 
         // Return the updated team item view
         return convertView;
     }
 
 
-    private void setupFollowButton() {
+    private void setupFollowButton(Team team) {
 
         boolean isFav = false;
 
         //check if the team is a favorite
         if (followedTeamArrayList != null){
-            isFav = doesContain(followedTeamArrayList, team);
+            isFav = doesContain(team);
         }
 
         if (!isFav){  //team is not a favorite
@@ -169,7 +188,7 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
         }
     }
 
-    private boolean doesContain(ArrayList<Team> followedTeamArrayList, Team team) {
+    private boolean doesContain(Team team) {
         for (Team t: followedTeamArrayList){
             if (t.getTeamName().equals(team.getTeamName())){
                 return true;
