@@ -15,7 +15,7 @@ import edu.wpi.goalify.models.TeamLocation;
 public class DBHelper  extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "SQLiteData.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     public static final String TABLE_NAME = "followed_teams";
     public static final String TEAM_ID = "_id";
     public static final String TEAM_NAME = "team_name";

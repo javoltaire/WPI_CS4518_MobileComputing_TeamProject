@@ -139,6 +139,51 @@ public class MyServlet extends HttpServlet {
 //            }
 //        });
 
+<<<<<<< HEAD
+        DatabaseReference ref = database.getReference();
+
+        Map<String, Match> matchesMap = new HashMap<String, Match>();
+
+        matchArrayList = new ArrayList<>();
+<<<<<<< HEAD
+        long addTime = 11; //sec
+        Match match = new Match(100, "Test1",200, "Test2", 17, System.currentTimeMillis()/1000 + addTime);
+=======
+        Match match = new Match(100, "Test1",200, "Test2", 17, 1481625950);
+>>>>>>> d4ecde7ce917ce53be6445a7e8706e81f4ef92cf
+        matchArrayList.add(match);
+        if (matchArrayList != null) {
+            for (int i=0; i<matchArrayList.size(); i++){
+                Match m = matchArrayList.get(i);
+                matchesMap.put(m.getHomeTeamName() + " vs " + match.getAwayTeamName(), m);
+            }
+        }
+
+        ref.child("matches").setValue(matchesMap);
+
+        DatabaseReference matchesRef = database.getReference("matches");
+
+        matchesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    //getting data from snapshot
+                    Match match = snapshot.getValue(Match.class);
+                    System.out.println("Matches -> " + match.getStartTime());
+
+                    long currentTime = System.currentTimeMillis();
+                    //long fiveMins = 5 * 60; //in sec
+
+                    long delayTime = match.getStartTime() * 1000 - currentTime;
+                    System.out.println("CurrentTime: " + currentTime + "MatchTime: " + match.getStartTime() +
+                        "delayTime: " + delayTime);
+
+                    //Now create a new task with delayed execution
+                    Queue queue = QueueFactory.getQueue("notification-queue");
+                    queue.add(TaskOptions.Builder.withUrl("/notifications").param("teamName", String.valueOf(match.getAwayTeamName()))
+                            .countdownMillis(delayTime));
+//                    queue.add(TaskOptions.Builder.withUrl("/notifications").param("team", String.valueOf(match.getHomeTeamName()))
+=======
 //        DatabaseReference ref = database.getReference();
 //
 //        Map<String, Match> matchesMap = new HashMap<String, Match>();
@@ -175,6 +220,7 @@ public class MyServlet extends HttpServlet {
 //                    //Now create a new task with delayed execution
 //                    Queue queue = QueueFactory.getQueue("notification-queue");
 //                    queue.add(TaskOptions.Builder.withUrl("/notifications").param("teamName", String.valueOf(match.getAwayTeamName()))
+>>>>>>> 15dc7fb1cdb4e848bc3562579a1fe6ad9f244924
 //                            .countdownMillis(delayTime));
 ////                    queue.add(TaskOptions.Builder.withUrl("/notifications").param("team", String.valueOf(match.getHomeTeamName()))
 ////                            .countdownMillis(delayTime));
@@ -305,7 +351,7 @@ public class MyServlet extends HttpServlet {
 //            }
 //        }
 
-
+//
 //        String teamsJsonStr = sh.makeServiceCall(mainUrl + teams);
 //
 //        if (teamsJsonStr != null) {
@@ -389,7 +435,7 @@ public class MyServlet extends HttpServlet {
 //            }
 //        }
 
-//        DatabaseReference teamRef = ref.child("teams");
+//        DatabaseReference teamRef = database.getReference().child("teams");
 //
 //        Map<String, Team> teamsMap = new HashMap<String, Team>();
 //
