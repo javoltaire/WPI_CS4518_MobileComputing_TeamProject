@@ -1,6 +1,7 @@
 package edu.wpi.goalify.activities;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +21,8 @@ import edu.wpi.goalify.R;
 import edu.wpi.goalify.adapters.TeamsAdapter;
 import edu.wpi.goalify.dataservice.FirebaseUtil;
 import edu.wpi.goalify.models.Team;
+import edu.wpi.goalify.models.TeamLocation;
+import edu.wpi.goalify.sqlite.DBHelper;
 
 public class TeamsActivity extends AppCompatActivity {
 
@@ -59,7 +62,7 @@ public class TeamsActivity extends AppCompatActivity {
         long leagueId = getIntent().getLongExtra(NewTeamActivity.LEAGUE_ID, LEAGUE_ID_DEFAULT);
         if(leagueId == LEAGUE_ID_DEFAULT){
             //TODO: Show users teams
-
+            getFollowedTeams();
             setTitle("Your Teams");
         }
         else{
@@ -140,6 +143,28 @@ public class TeamsActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void getFollowedTeams(){
+        DBHelper dbHelper = new DBHelper(this);
+        Cursor cursor = dbHelper.getAllTeams();
+        cursor.moveToFirst();
+
+        while(!cursor.isAfterLast()){
+            int teamID = cursor.getInt(0);
+            String teamName = cursor.getString(1);
+            double lat = cursor.getDouble(2);
+            double lon = cursor.getDouble(3);
+
+            Team t = new Team(teamID, teamName, new TeamLocation(lat, lon));
+            mTeamsAdapter.add(t);
+
+            cursor.moveToNext();
+        }
+
+        mTeamsAdapter.notifyDataSetChanged();
+        cursor.close();
+
     }
     //endregion
 }
