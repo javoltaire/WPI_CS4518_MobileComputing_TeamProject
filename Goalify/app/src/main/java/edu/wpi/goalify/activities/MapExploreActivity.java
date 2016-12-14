@@ -29,13 +29,22 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 import edu.wpi.goalify.R;
+import edu.wpi.goalify.dataservice.FirebaseUtil;
+import edu.wpi.goalify.models.Team;
 
 public class MapExploreActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     GoogleMap mGoogleMap;
     GoogleApiClient mGoogleApiClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +62,6 @@ public class MapExploreActivity extends AppCompatActivity implements OnMapReadyC
 
     private void initMap() {
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment);
-//        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
-//                .findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
 
     }
@@ -231,9 +238,35 @@ public class MapExploreActivity extends AppCompatActivity implements OnMapReadyC
 
     }
 
-    private void initTeamMarkers(){
-        setMarker("Boston", 42.3601, -71.0589);
+    //get all team markers
+    private void getAllTeams(){
+        Query queryReference = FirebaseUtil.getTeamsReference().orderByKey();
+        queryReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> snapShots = dataSnapshot.getChildren();
+                for(DataSnapshot snapshot : snapShots) {
+                    Team team = snapshot.getValue(Team.class);
+                    setMarker(team.getTeamName(),team.getTeamLocation().getTeamLatitude(),team.getTeamLocation().getTeamLongitude());
 
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
+    //initialize markers
+    private void initTeamMarkers(){
+        //setMarker("Boston", 42.3601, -71.0589);
+        getAllTeams();
 
     }
 }

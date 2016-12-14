@@ -51,7 +51,6 @@ public class DBHelper  extends SQLiteOpenHelper {
         contentValues.put(TEAM_NAME, name);
         contentValues.put(TEAM_LOCATION_LAT, lat);
         contentValues.put(TEAM_LOCATION_LON, lat);
-        //db.insert(TABLE_NAME, null, contentValues);
         db.insertWithOnConflict(TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
         return true;
     }

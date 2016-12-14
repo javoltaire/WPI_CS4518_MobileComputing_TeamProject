@@ -52,7 +52,6 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
         followedTeamArrayList = new ArrayList<>();
 
         Cursor cursor = dbHelper.getAllTeams();
-
         cursor.moveToFirst();
 
         while(!cursor.isAfterLast()){
@@ -90,16 +89,14 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
                 dbHelper.deleteTeam(team.getTeamId());
             }
         }
+
     }
-    //endregion
 
     //region Overridden Methods
 
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-
         // Grab the data item for this position, make sure that it is not null
         final Team team = getItem(position);
 
@@ -181,12 +178,12 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
                     followTeamBtn.setChecked(false);
 
 
+
                 }
 
                 //save the array list
                 if (followedTeamArrayList != null){
                     for (Team t: followedTeamArrayList){
-                        System.out.println("**************adding a team*********************");
                         dbHelper.insertTeam(t.getTeamId(), t.getTeamName(), t.getTeamLocation().getTeamLatitude(), t.getTeamLocation().getTeamLongitude());
                     }
                 }
@@ -224,7 +221,7 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
             isFav = doesContain(team);
         }
 
-        if (!isFav){  //airlines is not a favorite
+        if (!isFav){  //team is not a favorite
 
             //System.out.println("**************is not a favorite team*********************");
 
