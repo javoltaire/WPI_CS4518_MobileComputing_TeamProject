@@ -147,7 +147,7 @@ public class NewTeamActivity extends AppCompatActivity {
         mLocalTeamsListView.setAdapter(mLocalTeamsAdapter);
         mLocalTeamsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-                Intent teamIntent = new Intent(NewTeamActivity.this, TeamsActivity.class);
+                Intent teamIntent = new Intent(NewTeamActivity.this, TeamDetailActivity.class);
                 startActivity(teamIntent);
             }
         });
