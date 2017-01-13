@@ -3,6 +3,7 @@ package edu.wpi.goalify.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,12 +41,13 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
     /**
      * Initializes a new instance of this class
      * @param context
-     * @param teams
      */
     public TeamsAdapter(Context context, ArrayList<Team> teams){
         super(context, R.layout.item_team, teams);
         init();
     }
+
+
 
     private void init() {
         dbHelper = new DBHelper(getContext());
@@ -89,7 +91,6 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
                 dbHelper.deleteTeam(team.getTeamId());
             }
         }
-
     }
 
     //region Overridden Methods
@@ -212,12 +213,10 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
 
 
     private void setupFollowButton(ToggleButton followTeamBtn,  Team team) {
-
         boolean isFav = false;
 
         //check if the team is a favorite
         if (followedTeamArrayList != null){
-
             isFav = doesContain(team);
         }
 

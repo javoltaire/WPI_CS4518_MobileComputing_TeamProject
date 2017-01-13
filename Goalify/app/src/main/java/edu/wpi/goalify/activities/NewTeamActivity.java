@@ -96,6 +96,11 @@ public class NewTeamActivity extends AppCompatActivity {
     //endregion
 
     //region Event Handlers
+
+    /**
+     * Clears the search that was the just made
+     * @param view
+     */
     public void btnClearSearchOnClick(View view){
         if(mTeamsAdapter != null)
             mTeamsAdapter.clear();
@@ -104,6 +109,10 @@ public class NewTeamActivity extends AppCompatActivity {
     //endregion
 
     //region Private Methods
+
+    /**
+     * initializes some variables
+     */
     private void initControls(){
         mTeamNameEditText = (EditText) findViewById(R.id.editText_search_team_name);
         mTeamNameEditText.addTextChangedListener(new TextWatcher() {
@@ -182,12 +191,20 @@ public class NewTeamActivity extends AppCompatActivity {
         setTitle(R.string.add_new_team);
     }
 
+    /**
+     * Navigates to the team detail activity using an intent
+     * @param teamName
+     */
     private void goToTeamDetailActivity(String teamName){
         Intent teamDetailIntent = new Intent(this, TeamDetailActivity.class);
         teamDetailIntent.putExtra(MainActivity.TEAM_NAME, teamName);
         startActivity(teamDetailIntent);
     }
 
+    /**
+     * Hides or show certain controls depending on wheter the user is searching
+     * @param b
+     */
     private void goToSearchMode(boolean b){
         if(b){
             mClearSearchButton.setVisibility(View.VISIBLE);
@@ -202,6 +219,10 @@ public class NewTeamActivity extends AppCompatActivity {
     }
 
     //region Data Methods
+
+    /**
+     * Simulates getting leauge
+     */
     private void getLeagues(){
         mLeaguesAdapter.clear();
 
@@ -268,6 +289,9 @@ public class NewTeamActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Gets a list of teams that are the current area
+     */
     private void getLocalTeams(){
 
         int count = 0;

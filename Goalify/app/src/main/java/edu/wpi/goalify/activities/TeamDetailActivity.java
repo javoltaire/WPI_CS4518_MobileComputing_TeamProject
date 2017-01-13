@@ -92,6 +92,10 @@ public class TeamDetailActivity extends AppCompatActivity {
         setTitle("Teams");
     }
 
+    /**
+     * Hides or show a text view saying there are no results for the search if there's no data to be shown
+     * @param b
+     */
     private void showResult(boolean b){
         if(b){
             mNoResultTextView.setVisibility(View.GONE);
@@ -103,6 +107,10 @@ public class TeamDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Gets a list of matches for a team name
+     * @param teamName
+     */
     private void getMatchesForTeam(final String teamName){
         Query query = FirebaseUtil.getMatchesReference().orderByChild("startTime");
         teamsMatchesListener = query.addChildEventListener(new ChildEventListener() {
